@@ -17,6 +17,6 @@ Required:
 
 Optional:
 
-| Option   | Number of Arguments | Description |
+| Option   | No. Arguments | Description |
 | -------- | :-------------------: | ------ |
 | `--conf` | 1                   | Allows you to set a different location for the config file.This defaults to `../conf/facet_scanner.ini` relative to the script. |
