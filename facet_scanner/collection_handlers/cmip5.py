@@ -9,6 +9,7 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.collection_handlers.base import CollectionHandler
+import os
 
 class CMIP5(CollectionHandler):
     project_name = 'opensearch'
@@ -50,6 +51,9 @@ class CMIP5(CollectionHandler):
         """
 
         facets = {}
+
+        # Turn filepath into directory
+        dir_path = os.path.dirname(path)
 
         path_components = path.split('/')
 

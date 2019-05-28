@@ -11,6 +11,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 from facet_scanner.core.elasticsearch_connection import ElasticsearchConnection
 from abc import ABC, abstractmethod
 from tqdm import tqdm
+import os
 
 
 class CollectionHandler(ABC):
@@ -76,10 +77,14 @@ class CollectionHandler(ABC):
         matches = self.es.get_hits(index=index, query=query)
 
         for match in tqdm(matches, total=count, desc='Generate facets for documents'):
-            match_path = match['_source']['info']['directory']
+            match_dir = match['_source']['info']['directory']
+            match_filename = match['_source']['info']['name']
+
+            path = os.path.join(match_dir, match_filename
+                                )
             id = match['_id']
 
-            facets = self.get_facets(match_path)
+            facets = self.get_facets(path)
             project = {
                 'application_id': self.project_name,
             }
