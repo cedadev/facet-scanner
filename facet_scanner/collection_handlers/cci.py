@@ -39,12 +39,12 @@ class CCI(CollectionHandler):
         facets = {}
 
         # Extract facets from the filename
-        drs, tags = self.pds._parse_file_name(path, os.path.dirname(path))
+        drs, tags = self.pds._parse_file_name(os.path.dirname(path),path)
         facets.update(drs)
 
 
         # Extract facets from the file
-        drs, tags = self.pds._scan_net_cdf_file(path, os.path.dirname(path), tags.get(PROCESSING_LEVEL))
+        drs, tags = self.pds._scan_net_cdf_file(os.path.dirname(path), path, tags.get(PROCESSING_LEVEL))
         facets.update(drs)
 
         return facets
