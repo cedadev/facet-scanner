@@ -9,9 +9,6 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.collection_handlers.base import CollectionHandler
-from netCDF4 import Dataset
-import re
-import requests
 import os
 from cci_tagger.tagger import ProcessDatasets
 from cci_tagger.constants import PROCESSING_LEVEL

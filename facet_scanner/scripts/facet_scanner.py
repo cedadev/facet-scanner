@@ -10,6 +10,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.collection_handlers.util.facet_factory import FacetFactory
 import argparse
+import os
 from configparser import RawConfigParser
 
 
@@ -34,8 +35,11 @@ class FacetScanner:
 
     def process_path(self, path):
 
+        print('Getting handler...')
         handler = self.get_handler(path)
+        print(handler)
 
+        print('Retrieving facets...')
         handler.update_facets(path, self.index)
 
     @classmethod
@@ -43,13 +47,14 @@ class FacetScanner:
         # Get command line arguments
         parser = argparse.ArgumentParser(description='Process path for facets and update the index')
         parser.add_argument('path', type=str, help='Path to process')
-        parser.add_argument('--conf', dest='conf', default='../conf/facet_scanner.ini')
+        parser.add_argument('--conf', dest='conf', default=os.path.join(os.path.dirname(__file__),'../conf/facet_scanner.ini'))
 
         args = parser.parse_args()
 
         # Load config file
-        conf = RawConfigParser(args.conf)
-        conf.read()
+        print('Loading config...')
+        conf = RawConfigParser()
+        conf.read(args.conf)
 
         # Initialise scanner
         scanner = cls(conf)

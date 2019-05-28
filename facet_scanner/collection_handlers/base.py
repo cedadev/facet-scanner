@@ -75,7 +75,7 @@ class CollectionHandler(ABC):
 
         matches = self.es.get_hits(index=index, query=query)
 
-        for match in tqdm(matches, total=count):
+        for match in tqdm(matches, total=count, desc='Generate facets for documents'):
             match_path = match['_source']['info']['directory']
             id = match['_id']
 
