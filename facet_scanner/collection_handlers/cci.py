@@ -44,7 +44,7 @@ class CCI(CollectionHandler):
 
 
         # Extract facets from the file
-        drs, tags = self.pds._scan_net_cdf_file(os.path.dirname(path), path, tags.get(PROCESSING_LEVEL))
+        drs, tags = self.pds._scan_net_cdf_file(path, os.path.dirname(path), tags.get(PROCESSING_LEVEL))
         facets.update(drs)
 
         return facets
