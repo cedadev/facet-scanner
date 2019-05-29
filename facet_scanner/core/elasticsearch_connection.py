@@ -9,7 +9,8 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import scan, bulk
+from elasticsearch.helpers import scan, bulk, parallel_bulk
+from collections import deque
 
 
 class ElasticsearchConnection:
@@ -53,7 +54,9 @@ class ElasticsearchConnection:
 
     def bulk(self, iterator, *args, generator=False):
         if generator:
-            bulk(self.es, iterator(*args))
+            deque(
+                parallel_bulk(self.es, iterator(*args))
+            )
         else:
             bulk(self.es, iterator)
 
