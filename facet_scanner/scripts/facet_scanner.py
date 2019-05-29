@@ -12,6 +12,7 @@ from facet_scanner.collection_handlers.util.facet_factory import FacetFactory
 import argparse
 import os
 from configparser import RawConfigParser
+from facet_scanner.util.snippets import query_yes_no
 
 
 class FacetScanner:
@@ -24,9 +25,22 @@ class FacetScanner:
         self.es_password = conf.get('elasticsearch', 'es_password')
         self.index = conf.get('elasticsearch', 'target_index')
 
-    def get_handler(self, path):
+        print(
+            f'Host: {self.es_host} '
+            f'User: {self.es_user} '
+            f'Index: {self.index} '
+            f'Password: {"*******" if self.es_password is not None else None}'
+        )
 
+        query_yes_no('Check the above variables. Ready to continue?')
+
+    def get_handler(self, path):
         handler = self.handler_factory.get_handler(path)
+
+        # Handle situation where handler not found
+        if handler is None:
+            raise NotImplementedError('The script was unable to find a match in facet_scanner.collection_handlers.util.collection_map.'
+                                      'Please update the mapping file.')
 
         return handler(
             host=self.es_host,
@@ -34,7 +48,6 @@ class FacetScanner:
         )
 
     def process_path(self, path):
-
         print('Getting handler...')
         handler = self.get_handler(path)
         print(handler)
@@ -47,7 +60,8 @@ class FacetScanner:
         # Get command line arguments
         parser = argparse.ArgumentParser(description='Process path for facets and update the index')
         parser.add_argument('path', type=str, help='Path to process')
-        parser.add_argument('--conf', dest='conf', default=os.path.join(os.path.dirname(__file__),'../conf/facet_scanner.ini'))
+        parser.add_argument('--conf', dest='conf',
+                            default=os.path.join(os.path.dirname(__file__), '../conf/facet_scanner.ini'))
 
         args = parser.parse_args()
 
@@ -55,6 +69,7 @@ class FacetScanner:
         print('Loading config...')
         conf = RawConfigParser()
         conf.read(args.conf)
+        print(f'Analysis path: {args.path}')
 
         # Initialise scanner
         scanner = cls(conf)
@@ -62,12 +77,6 @@ class FacetScanner:
         # Run scanner
         scanner.process_path(args.path)
 
+
 if __name__ == '__main__':
-
     FacetScanner.main()
-
-
-
-
-
-
