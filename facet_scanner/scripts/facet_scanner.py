@@ -87,29 +87,7 @@ class FacetScanner:
         scanner.process_path(args)
 
 
-class LotusFacetScanner(FacetScanner):
 
-    def process_path(self, cmd_args):
-        """
-
-        :param cmd_args: Arguments from the command line
-        """
-        print('Getting handler...')
-        handler = self.get_handler(cmd_args.path)
-        print(handler)
-
-        print('Retrieving facets...')
-        handler.update_facets(cmd_args.path, self.index, cmd_args.processing_path)
-
-    @staticmethod
-    def _get_command_line_args():
-        # Get command line arguments
-        parser = argparse.ArgumentParser(description='Process path for facets and update the index')
-        parser.add_argument('path', type=str, help='Path to process')
-        parser.add_argument('--conf', dest='conf',
-                            default=os.path.join(os.path.dirname(__file__), '../conf/facet_scanner.ini'))
-
-        return parser.parse_args()
 
 
 if __name__ == '__main__':

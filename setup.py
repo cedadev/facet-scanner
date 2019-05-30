@@ -69,7 +69,6 @@ setup(
     entry_points={
         'console_scripts': [
             'facet_scanner = facet_scanner.scripts.facet_scanner:FacetScanner.main',
-            'lotus_facet_scanner = facet_scanner.scripts.facet_scanner:LotusFacetScanner.main'
         ]
     }
 )
