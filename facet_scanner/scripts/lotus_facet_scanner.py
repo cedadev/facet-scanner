@@ -8,7 +8,7 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.scripts.facet_scanner import FacetScanner
+from facet_scanner.scripts.facet_scanner_cmd import FacetScanner
 import argparse
 import os
 
@@ -36,3 +36,4 @@ class LotusFacetScanner(FacetScanner):
                             default=os.path.join(os.path.dirname(__file__), '../conf/facet_scanner.ini'))
 
         return parser.parse_args()
+
