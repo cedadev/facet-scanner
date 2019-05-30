@@ -9,6 +9,7 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import sys
+import itertools
 
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
@@ -20,6 +21,11 @@ def query_yes_no(question, default="yes"):
 
     The "answer" return value is True for "yes" or False for "no".
     """
+
+    # If the programme is being run non-interactively, assume true
+    if not sys.stdin.isatty():
+        return True
+
     valid = {'yes': True, 'y': True,
              'no': False, 'n': False}
     if default is None:
@@ -41,3 +47,12 @@ def query_yes_no(question, default="yes"):
         else:
             sys.stdout.write('Please respond with "yes" or "no" '
                              '(or "y" or "n").\n')
+
+def generator_grouper(n, it):
+    while True:
+        chunk_it = itertools.islice(it, n)
+        try:
+            first_element =  next(chunk_it)
+        except StopIteration:
+            return
+        yield itertools.chain((first_element,), chunk_it)

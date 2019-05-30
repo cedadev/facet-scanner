@@ -47,23 +47,32 @@ class FacetScanner:
             http_auth=(self.es_user, self.es_password)
         )
 
-    def process_path(self, path):
+    def process_path(self, cmd_args):
+        """
+
+        :param cmd_args: Arguments from the command line
+        """
         print('Getting handler...')
-        handler = self.get_handler(path)
+        handler = self.get_handler(cmd_args.path)
         print(handler)
 
         print('Retrieving facets...')
-        handler.update_facets(path, self.index)
+        handler.export_facets(cmd_args.path, self.index, cmd_args.processing_path)
 
-    @classmethod
-    def main(cls):
+    @staticmethod
+    def _get_command_line_args():
         # Get command line arguments
         parser = argparse.ArgumentParser(description='Process path for facets and update the index')
         parser.add_argument('path', type=str, help='Path to process')
+        parser.add_argument('processing_path', type=str, help='Path to output intermediate files')
         parser.add_argument('--conf', dest='conf',
                             default=os.path.join(os.path.dirname(__file__), '../conf/facet_scanner.ini'))
 
-        args = parser.parse_args()
+        return parser.parse_args()
+
+    @classmethod
+    def main(cls):
+        args = cls._get_command_line_args()
 
         # Load config file
         print('Loading config...')
@@ -75,8 +84,34 @@ class FacetScanner:
         scanner = cls(conf)
 
         # Run scanner
-        scanner.process_path(args.path)
+        scanner.process_path(args)
+
+
+class LotusFacetScanner(FacetScanner):
+
+    def process_path(self, cmd_args):
+        """
+
+        :param cmd_args: Arguments from the command line
+        """
+        print('Getting handler...')
+        handler = self.get_handler(cmd_args.path)
+        print(handler)
+
+        print('Retrieving facets...')
+        handler.update_facets(cmd_args.path, self.index, cmd_args.processing_path)
+
+    @staticmethod
+    def _get_command_line_args():
+        # Get command line arguments
+        parser = argparse.ArgumentParser(description='Process path for facets and update the index')
+        parser.add_argument('path', type=str, help='Path to process')
+        parser.add_argument('--conf', dest='conf',
+                            default=os.path.join(os.path.dirname(__file__), '../conf/facet_scanner.ini'))
+
+        return parser.parse_args()
 
 
 if __name__ == '__main__':
     FacetScanner.main()
+

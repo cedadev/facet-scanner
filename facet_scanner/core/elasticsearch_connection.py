@@ -23,6 +23,9 @@ class ElasticsearchConnection:
 
     def get_query(self, extensions, path, excludes=[]):
         query_base = {
+            "_source": {
+                "exclude": ["info.phenomena"]
+            },
             "query": {
                 "bool": {
                     "must": [
@@ -32,7 +35,7 @@ class ElasticsearchConnection:
                             }
                         }
                     ],
-                    "must_not":[],
+                    "must_not": [],
                     "filter": []
                 }
             }
