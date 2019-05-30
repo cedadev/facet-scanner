@@ -13,6 +13,7 @@ from abc import ABC, abstractmethod
 import os
 import subprocess
 import json
+import importlib.util
 
 from facet_scanner.util import snippets
 
@@ -79,7 +80,9 @@ class CollectionHandler(ABC):
             with open(filepath, 'w') as writer:
                 writer.writelines(map(lambda x: f'{json.dumps(x)}\n', page))
 
-            task = f'python lotus_facet_scanner {filepath}'
+
+            script_path = importlib.util.find_spec('facet_scanner.scripts.lotus_facet_scanner').origin
+            task = f'python {script_path} {filepath}'
             command = f'bsub -W 24:00 {task}'
             print(command)
 
