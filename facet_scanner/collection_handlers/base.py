@@ -84,10 +84,8 @@ class CollectionHandler(ABC):
             script_path = importlib.util.find_spec('facet_scanner.scripts.lotus_facet_scanner').origin
             task = f'python {script_path} {filepath}'
             command = f'bsub -W 24:00 {task}'
-            print(command)
 
-            # subprocess.run(command, shell=True)
-
+            subprocess.run(command, shell=True)
 
     def update_facets(self, path, index):
         """
