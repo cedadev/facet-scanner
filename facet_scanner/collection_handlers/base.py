@@ -118,11 +118,11 @@ class CollectionHandler(ABC):
                 match_dir = match['_source']['info']['directory']
                 match_filename = match['_source']['info']['name']
 
-                path = os.path.join(match_dir, match_filename
+                data_path = os.path.join(match_dir, match_filename
                                     )
                 id = match['_id']
 
-                facets = self.get_facets(path)
+                facets = self.get_facets(data_path)
                 project = {
                     'application_id': self.project_name,
                 }
