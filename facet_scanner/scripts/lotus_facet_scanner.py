@@ -37,3 +37,5 @@ class LotusFacetScanner(FacetScanner):
 
         return parser.parse_args()
 
+if __name__ == '__main__':
+    LotusFacetScanner.main()
