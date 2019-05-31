@@ -11,6 +11,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 from facet_scanner.scripts.facet_scanner_cmd import FacetScanner
 import argparse
 import os
+import json
 
 
 class LotusFacetScanner(FacetScanner):
@@ -20,8 +21,16 @@ class LotusFacetScanner(FacetScanner):
 
         :param cmd_args: Arguments from the command line
         """
+
+        # Get first item in processing file to extract path to get handler
+        with open(cmd_args.path) as reader:
+            first_line = reader.readline()
+        dataset_path = json.loads(first_line)['_source']['info']['directory']
+
+        print(f'Dataset path: {dataset_path}')
+
         print('Getting handler...')
-        handler = self.get_handler(cmd_args.path)
+        handler = self.get_handler(dataset_path)
         print(handler)
 
         print('Retrieving facets...')
