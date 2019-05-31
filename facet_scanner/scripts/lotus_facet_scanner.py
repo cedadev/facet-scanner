@@ -34,7 +34,7 @@ class LotusFacetScanner(FacetScanner):
         print(handler)
 
         print('Retrieving facets...')
-        handler.update_facets(cmd_args.path, self.index, cmd_args.processing_path)
+        handler.update_facets(cmd_args.path, self.index)
 
     @staticmethod
     def _get_command_line_args():

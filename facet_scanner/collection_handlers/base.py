@@ -14,7 +14,7 @@ import os
 import subprocess
 import json
 import importlib.util
-
+from tqdm import tqdm
 from facet_scanner.util import snippets
 
 
@@ -111,7 +111,7 @@ class CollectionHandler(ABC):
         with open(path) as reader:
 
 
-            for line in reader:
+            for line in tqdm(reader, desc='Gathering facets'):
 
                 match = json.loads(line.strip())
 
