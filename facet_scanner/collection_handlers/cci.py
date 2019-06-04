@@ -27,7 +27,9 @@ class CCI(CollectionHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.pds = ProcessDatasets(suppress_file_output=True)
+        vocab_file = self.conf.get('cci', 'vocab_file')
+
+        self.pds = ProcessDatasets(suppress_file_output=True, filepath=vocab_file)
 
     def get_facets(self, path):
         """

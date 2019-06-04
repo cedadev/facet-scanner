@@ -34,7 +34,7 @@ class FacetScanner:
 
         query_yes_no('Check the above variables. Ready to continue?')
 
-    def get_handler(self, path):
+    def get_handler(self, path, conf):
         handler = self.handler_factory.get_handler(path)
 
         # Handle situation where handler not found
@@ -44,16 +44,18 @@ class FacetScanner:
 
         return handler(
             host=self.es_host,
-            http_auth=(self.es_user, self.es_password)
+            http_auth=(self.es_user, self.es_password),
+            conf = conf
+
         )
 
-    def process_path(self, cmd_args):
+    def process_path(self, cmd_args, conf):
         """
 
         :param cmd_args: Arguments from the command line
         """
         print('Getting handler...')
-        handler = self.get_handler(cmd_args.path)
+        handler = self.get_handler(cmd_args.path, conf)
         print(handler)
 
         print('Retrieving facets...')
@@ -84,7 +86,7 @@ class FacetScanner:
         scanner = cls(conf)
 
         # Run scanner
-        scanner.process_path(args)
+        scanner.process_path(args, conf)
 
 
 

@@ -42,14 +42,15 @@ class CollectionHandler(ABC):
     #   }
     filters = []
 
-    def __init__(self, host, *args, **kwargs):
+    def __init__(self, host, http_auth, conf, **kwargs):
         """
         Create the elasticsearch connection
         :param host: Elasticsearch Host
         :param args: args to pass into the Elasticsearch connection class
         :param kwargs: kwargs to pass into the Elasticsearch connection class
         """
-        self.es = ElasticsearchConnection(host=host, *args, **kwargs)
+        self.es = ElasticsearchConnection(host=host, http_auth=http_auth, **kwargs)
+        self.conf = conf
 
     @abstractmethod
     def get_facets(self, path):
