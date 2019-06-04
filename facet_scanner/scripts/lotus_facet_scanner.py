@@ -16,7 +16,7 @@ import json
 
 class LotusFacetScanner(FacetScanner):
 
-    def process_path(self, cmd_args):
+    def process_path(self, cmd_args, conf):
         """
 
         :param cmd_args: Arguments from the command line
@@ -30,7 +30,7 @@ class LotusFacetScanner(FacetScanner):
         print(f'Dataset path: {dataset_path}')
 
         print('Getting handler...')
-        handler = self.get_handler(dataset_path)
+        handler = self.get_handler(dataset_path, conf)
         print(handler)
 
         print('Retrieving facets...')
