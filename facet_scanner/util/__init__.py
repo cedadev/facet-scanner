@@ -3,9 +3,11 @@
 
 """
 __author__ = 'Richard Smith'
-__date__ = '26 Mar 2019'
+__date__ = '11 Jun 2019'
 __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from .facet_factory import FacetFactory
+from .snippets import query_yes_no
+from .snippets import count_lotus_jobs
+from .snippets import generator_grouper

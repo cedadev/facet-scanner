@@ -15,7 +15,8 @@ import subprocess
 import json
 import importlib.util
 from tqdm import tqdm
-from facet_scanner.util import snippets
+from facet_scanner.util import generator_grouper
+import time
 
 
 
@@ -74,13 +75,17 @@ class CollectionHandler(ABC):
         matches = self.es.get_hits(index=index, query=query)
 
         print('Outputting pages to file...')
-        for i,page in enumerate(snippets.generator_grouper(batch_size, matches)):
+        for i,page in enumerate(generator_grouper(batch_size, matches)):
+
+            # Pause every 10 so as to not overwhelm the
+            if i and not i % 10:
+                print('Pausing for 10 mins')
+                time.sleep(600)
 
             filepath = os.path.join(processing_path, f'results_page_{i}.json')
 
             with open(filepath, 'w') as writer:
                 writer.writelines(map(lambda x: f'{json.dumps(x)}\n', page))
-
 
             script_path = importlib.util.find_spec('facet_scanner.scripts.lotus_facet_scanner').origin
             task = f'python {script_path} {filepath}'
