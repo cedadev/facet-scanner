@@ -54,7 +54,8 @@ class CCI(CollectionHandler):
 
         # Get MOLES catalogue
         moles_info = self.catalogue.get_moles_record_metadata(path)
+
         if moles_info:
-            facets['dataset_id'] = moles_info
+            facets['dataset_id'] = moles_info['url']
 
         return facets
