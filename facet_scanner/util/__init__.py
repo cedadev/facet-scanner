@@ -9,5 +9,4 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from .snippets import query_yes_no
-from .snippets import count_lotus_jobs
 from .snippets import generator_grouper

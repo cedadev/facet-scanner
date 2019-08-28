@@ -12,6 +12,7 @@ from facet_scanner.collection_handlers.base import CollectionHandler
 import os
 from cci_tagger.tagger import ProcessDatasets
 from cci_tagger.constants import PROCESSING_LEVEL
+from .util import CatalogueDatasets
 
 
 class CCI(CollectionHandler):
@@ -31,6 +32,8 @@ class CCI(CollectionHandler):
 
         self.pds = ProcessDatasets(suppress_file_output=True, filepath=vocab_file)
 
+        self.catalogue = CatalogueDatasets()
+
     def get_facets(self, path):
         """
         Extract the facets from the file path
@@ -48,5 +51,10 @@ class CCI(CollectionHandler):
         # Extract facets from the file
         drs, tags = self.pds._scan_net_cdf_file(path, os.path.dirname(path), tags.get(PROCESSING_LEVEL))
         facets.update(drs)
+
+        # Get MOLES catalogue
+        moles_info = self.catalogue.get_moles_record_metadata(path)
+        if moles_info:
+            facets['dataset_id'] = moles_info
 
         return facets

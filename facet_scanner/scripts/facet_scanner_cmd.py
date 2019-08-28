@@ -60,7 +60,7 @@ class FacetScanner:
         print(handler)
 
         print('Retrieving facets...')
-        handler.export_facets(cmd_args.path, self.index, cmd_args.processing_path, batch_size=cmd_args.num_files)
+        handler.export_facets(cmd_args.path, self.index, cmd_args.processing_path, rerun=cmd_args.rerun, batch_size=cmd_args.num_files)
 
     @staticmethod
     def _get_command_line_args():
@@ -68,6 +68,7 @@ class FacetScanner:
         parser = argparse.ArgumentParser(description='Process path for facets and update the index')
         parser.add_argument('path', type=str, help='Path to process')
         parser.add_argument('processing_path', type=str, help='Path to output intermediate files')
+        parser.add_argument('--rerun', action='store_true', help='Disable paging to disk on rerun')
         parser.add_argument('--num-files', dest='num_files', type=int, help='Number of files per lotus job',
                             default=500)
         parser.add_argument('--conf', dest='conf',

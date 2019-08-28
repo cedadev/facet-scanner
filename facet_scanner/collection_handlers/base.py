@@ -19,7 +19,6 @@ from facet_scanner.util import generator_grouper
 import time
 
 
-
 class CollectionHandler(ABC):
 
     @property
@@ -62,34 +61,46 @@ class CollectionHandler(ABC):
         """
         pass
 
-    def export_facets(self, path, index, processing_path, batch_size=500):
+    def export_facets(self, path, index, processing_path, lotus=True, rerun=False, batch_size=500):
         """
         Dumps the list of files to process and calls lotus to add to index
         :param path: directory root of the collection
         :param index: index to add the facets to
         :param processing_path: directory to place the elasticsearch pages for processing by lotus
+        :param lotus: Boolean. True will set processes to run on lotus
+        :param batch_size: Size of pages to send for processing
         """
 
         query = self.es.get_query(self.extensions, path, excludes=self.filters)
 
         matches = self.es.get_hits(index=index, query=query)
 
-        print('Outputting pages to file...')
-        for i,page in enumerate(generator_grouper(batch_size, matches)):
+        if not rerun:
+            print('Outputting pages to file...')
+            for i, page in enumerate(generator_grouper(batch_size, matches)):
+                filepath = os.path.join(processing_path, f'results_page_{i}.json')
 
-            # Pause every 10 so as to not overwhelm the
+                with open(filepath, 'w') as writer:
+                    writer.writelines(map(lambda x: f'{json.dumps(x)}\n', page))
+
+        if lotus:
+            self.lotus_submit(processing_path)
+
+    @staticmethod
+    def lotus_submit(processing_directory):
+
+        for i, file in enumerate(os.listdir(processing_directory)):
+
+            filepath = os.path.join(processing_directory, f'{file}')
+
+            # Pause every 10 so as to not overwhelm the API
             if i and not i % 10:
-                print('Pausing for 10 mins')
-                time.sleep(600)
-
-            filepath = os.path.join(processing_path, f'results_page_{i}.json')
-
-            with open(filepath, 'w') as writer:
-                writer.writelines(map(lambda x: f'{json.dumps(x)}\n', page))
+                print('Pausing for 1 mins')
+                time.sleep(60)
 
             script_path = importlib.util.find_spec('facet_scanner.scripts.lotus_facet_scanner').origin
             task = f'python {script_path} {filepath}'
-            command = f'bsub -W 24:00 {task}'
+            command = f'bsub -W 24:00 -e errors/{file}.err {task}'
 
             subprocess.run(command, shell=True)
 
@@ -114,16 +125,14 @@ class CollectionHandler(ABC):
         # Load items from file
         with open(path) as reader:
 
-
             for line in tqdm(reader, desc='Gathering facets'):
-
                 match = json.loads(line.strip())
 
                 match_dir = match['_source']['info']['directory']
                 match_filename = match['_source']['info']['name']
 
                 data_path = os.path.join(match_dir, match_filename
-                                    )
+                                         )
                 id = match['_id']
 
                 facets = self.get_facets(data_path)
