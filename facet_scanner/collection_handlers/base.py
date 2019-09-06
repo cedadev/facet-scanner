@@ -9,7 +9,6 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.core.elasticsearch_connection import ElasticsearchConnection
-from abc import ABC, abstractmethod
 import os
 import subprocess
 import json
@@ -19,16 +18,15 @@ from facet_scanner.util import generator_grouper
 import time
 
 
-class CollectionHandler(ABC):
+class CollectionHandler:
 
     @property
-    @abstractmethod
     def project_name(self):
         """
         Make the setting of a project name mandatory.
         Abstract property for name of the project eg. opensearch
         """
-        pass
+        raise NotImplementedError
 
     # File extensions to include
     extensions = []
@@ -52,14 +50,17 @@ class CollectionHandler(ABC):
         self.es = ElasticsearchConnection(host=host, http_auth=http_auth, **kwargs)
         self.conf = conf
 
-    @abstractmethod
     def get_facets(self, path):
         """
         Each collection handler must specify the method for extracting the facets
         :param path: File path
         :return: dict Facet:value pairs
         """
-        pass
+        raise NotImplementedError
+
+
+    def generate_collections(self, path):
+        raise NotImplementedError
 
     def export_facets(self, path, index, processing_path, lotus=True, rerun=False, batch_size=500):
         """
@@ -137,41 +138,19 @@ class CollectionHandler(ABC):
 
                 facets = self.get_facets(data_path)
                 project = {
-                    'application_id': self.project_name,
+                    self.project_name: facets
                 }
-
-                project.update(facets)
 
                 yield {
                     '_index': index,
                     '_op_type': 'update',
                     '_id': id,
                     '_type': 'file',
-                    'script': {
-                        'source': """
-                            if (ctx._source.containsKey(\"projects\")){
-    
-                                for (proj in ctx._source.projects){
-                                    if (proj.project_id == params.project.project_id){
-                                        params.exists = true;
-                                        break;
-                                    }
-                                }
-                                if (!params.exists){
-                                    ctx._source.projects.addAll([params.project]);
-                                }
-                            }
-                            else {
-                                ctx._source.projects = [params.project]
-                            }
-                          """,
-                        'params': {
-                            'project': project,
-                            'exists': False
-                        }
-                    }
+                    'doc': {'projects': project}
+
                 }
 
         # Remove file once processed
         if os.path.exists(path):
             os.remove(path)
+

@@ -25,7 +25,7 @@ from requests.exceptions import Timeout
 
 class CatalogueDatasets():
     
-    def __init__(self, moles_base='http://141-129.cloud.jc.rl.ac.uk'):
+    def __init__(self, moles_base='http://api.catalogue.ceda.ac.uk'):
         self.moles_base = moles_base
         
         self.moles_mapping_url = f'{moles_base}/api/v0/obs/all'

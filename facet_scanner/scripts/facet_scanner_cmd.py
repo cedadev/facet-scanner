@@ -50,6 +50,16 @@ class FacetScanner:
 
         )
 
+    def get_collection(self, path):
+        """
+        Take a file path and return the top level collection file path as defined in the collection map
+        :param path: input filepath
+        :return: top level collection path
+        """
+        collection_details, collection_path = self.handler_factory.get_collection_map(path)
+
+        return collection_path
+
     def process_path(self, cmd_args, conf):
         """
 
@@ -61,6 +71,11 @@ class FacetScanner:
 
         print('Retrieving facets...')
         handler.export_facets(cmd_args.path, self.index, cmd_args.processing_path, rerun=cmd_args.rerun, batch_size=cmd_args.num_files)
+
+        try:
+            handler.generate_collections(cmd_args.path)
+        except NotImplementedError:
+            print(f'Collection generator not implemented for {cmd_args.path}')
 
     @staticmethod
     def _get_command_line_args():
