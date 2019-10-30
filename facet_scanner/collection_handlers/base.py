@@ -47,6 +47,9 @@ class CollectionHandler:
         :param args: args to pass into the Elasticsearch connection class
         :param kwargs: kwargs to pass into the Elasticsearch connection class
         """
+        # clean out extra arguments if they are there
+        kwargs.pop('collection_root')
+
         self.es = ElasticsearchConnection(host=host, http_auth=http_auth, **kwargs)
         self.conf = conf
 
@@ -56,10 +59,6 @@ class CollectionHandler:
         :param path: File path
         :return: dict Facet:value pairs
         """
-        raise NotImplementedError
-
-
-    def generate_collections(self, path):
         raise NotImplementedError
 
     def export_facets(self, path, index, processing_path, lotus=True, rerun=False, batch_size=500):
@@ -143,7 +142,7 @@ class CollectionHandler:
 
                 yield {
                     '_index': index,
-                    '_op_type': 'update',
+                    '_op_type': 'index',
                     '_id': id,
                     '_type': 'file',
                     'doc': {'projects': project}
@@ -153,4 +152,17 @@ class CollectionHandler:
         # Remove file once processed
         if os.path.exists(path):
             os.remove(path)
+
+    def _generate_collections(self, index):
+        """
+        Optional handle to enable different handling of collections between datasets.
+        Returns None and handles indexing of the relevant metadata.
+        :param path: File path being processed
+        """
+        raise NotImplementedError
+
+    def export_collections(self, index):
+        self.es.bulk(self._generate_collections, index, generator=True)
+
+
 

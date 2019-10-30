@@ -50,10 +50,22 @@ def query_yes_no(question, default="yes"):
                              '(or "y" or "n").\n')
 
 def generator_grouper(n, it):
+    """
+    Slices an iterator into smaller iterators of length n
+
+    :param n: Number of items to return
+    :param it: Generator
+    :return: Returns an iterator of n items
+    """
+
     while True:
         chunk_it = itertools.islice(it, n)
+
+        # Check if we have reached the end of the iterator
         try:
             first_element =  next(chunk_it)
         except StopIteration:
             return
+
+        # Join the first element back onto the next n elements
         yield itertools.chain((first_element,), chunk_it)

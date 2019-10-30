@@ -62,3 +62,6 @@ class ElasticsearchConnection:
 
     def count(self, *args, **kwargs):
         return self.es.count(*args, **kwargs).get('count')
+
+    def search(self, *args, **kwargs):
+        return self.es.search(*args, **kwargs)

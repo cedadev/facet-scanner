@@ -35,7 +35,7 @@ class FacetScanner:
         query_yes_no('Check the above variables. Ready to continue?')
 
     def get_handler(self, path, conf):
-        handler = self.handler_factory.get_handler(path)
+        handler, collection_root = self.handler_factory.get_handler(path)
 
         # Handle situation where handler not found
         if handler is None:
@@ -46,8 +46,8 @@ class FacetScanner:
         return handler(
             host=self.es_host,
             http_auth=(self.es_user, self.es_password),
-            conf=conf
-
+            conf=conf,
+            collection_root=collection_root
         )
 
     def get_collection(self, path):
@@ -72,10 +72,10 @@ class FacetScanner:
         print('Retrieving facets...')
         handler.export_facets(cmd_args.path, self.index, cmd_args.processing_path, rerun=cmd_args.rerun, batch_size=cmd_args.num_files)
 
-        try:
-            handler.generate_collections(cmd_args.path)
-        except NotImplementedError:
-            print(f'Collection generator not implemented for {cmd_args.path}')
+        # try:
+        #     handler.export_collections(cmd_args.path)
+        # except NotImplementedError:
+        #     print(f'Collection generator not implemented for {handler}')
 
     @staticmethod
     def _get_command_line_args():

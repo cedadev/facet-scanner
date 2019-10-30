@@ -13,6 +13,7 @@ import os
 from cci_tagger.tagger import ProcessDatasets
 from cci_tagger.constants import PROCESSING_LEVEL
 from .util import CatalogueDatasets
+import requests
 
 def nested_get(key_list, input_dict):
     """
@@ -35,6 +36,8 @@ def nested_get(key_list, input_dict):
 class CCI(CollectionHandler):
     """
     """
+    collection_id = 'cci'
+    collection_title = 'CCI'
 
     project_name = 'opensearch'
 
@@ -42,17 +45,17 @@ class CCI(CollectionHandler):
 
     filters = []
 
-    facets = [
-            'institution',
-            'product_version',
-            'product_string',
-            'processing_level',
-            'data_type',
-            'ecv',
-            'sensor',
-            'platform',
-            'time_coverage_resolution'
-        ]
+    facets = {
+            'institute': 'institution',
+            'productVersion': 'product_version',
+            'productString': 'product_string',
+            'processingLevel': 'processing_level',
+            'dataType': 'data_type',
+            'ecv': None,
+            'sensor': None,
+            'platform': None,
+            'frequency': 'time_coverage_resolution'
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -63,6 +66,14 @@ class CCI(CollectionHandler):
 
         self.catalogue = CatalogueDatasets()
 
+
+        if kwargs['collection_root'] is not None:
+            self.collection_root = kwargs['collection_root']
+        else:
+            raise TypeError('Collection root is None. '
+                            'Collection root cannot be None. '
+                            'Check handler factory')
+
     def get_facets(self, path):
         """
         Extract the facets from the file path
@@ -70,26 +81,40 @@ class CCI(CollectionHandler):
         :return: Dict  Facet:value pairs
         """
 
-        facets = {}
+        dataset_tags = {}
 
         # Extract facets from the filename
         drs, tags = self.pds._parse_file_name(os.path.dirname(path), path)
-        facets.update(drs)
-
+        dataset_tags.update(drs)
+        # todo: SHOULD USE TAGS. Hint. MOLES: def resolve_vocab_term(vocab_service, uri):
 
         # Extract facets from the file
         drs, tags = self.pds._scan_net_cdf_file(path, os.path.dirname(path), tags.get(PROCESSING_LEVEL))
-        facets.update(drs)
+        dataset_tags.update(drs)
+
+        # Translate between output from tagging code to map to named facets
+        mapped_facets = {}
+        for tag_name, tag_value in dataset_tags.items():
+
+            # Get facet name
+            for facet, tag_name_mapping in self.facets.items():
+
+                if tag_name == tag_name_mapping:
+                    mapped_facets[facet] = tag_value
+
+                if tag_name == facet and tag_name_mapping is None:
+                    mapped_facets[facet] = tag_value
 
         # Get MOLES catalogue
         moles_info = self.catalogue.get_moles_record_metadata(path)
 
         if moles_info:
-            facets['dataset_id'] = moles_info['url'].split('uuid/')[-1]
+            mapped_facets['datasetId'] = moles_info['url'].split('uuid/')[-1]
 
-        return facets
+        return mapped_facets
 
-    def get_temporal(self, results):
+    @staticmethod
+    def _get_temporal(results):
         """
         Get start and end date for collection
         :return:
@@ -104,12 +129,20 @@ class CCI(CollectionHandler):
 
         return temporal
 
-    def get_geospatial(self, results):
+    @staticmethod
+    def _get_geospatial(results):
+        """
+        Get bounding box from Elasticsearch aggregation response
+        :param results: Elasticsearch response
+        :return: Geospatial bbox dictionary
+        """
         """
         Get the bounding box
         :param path:
         :return:
         """
+
+        geospatial = {}
 
         top_left_lon = nested_get(('aggregations','bbox','bounds','top_left','lon'), results)
         top_left_lat = nested_get(('aggregations','bbox','bounds','top_left','lat'), results)
@@ -117,19 +150,50 @@ class CCI(CollectionHandler):
         bottom_right_lat = nested_get(('aggregations','bbox','bounds','bottom_right','lat'), results)
 
         if results['aggregations']['bbox']:
-            return {
-                'type': 'envelope',
-                'coordinates': [[top_left_lon, top_left_lat],[bottom_right_lon, bottom_right_lat]]
+            geospatial = {
+                'bbox': {
+                    'type': 'envelope',
+                    'coordinates': [[top_left_lon, top_left_lat], [bottom_right_lon, bottom_right_lat]]
+                }
             }
 
-        return {}
+        return geospatial
 
-    def get_collection_facets(self):
+    def _get_collection_facets(self, results):
+        """
+        Extracts the facet values from the elasticsearch response
+        :param results: Elasticsearch response json
+        :return: Dictionary of facet values
+        """
 
+        facets = {}
 
-        pass
+        for facet in self.facets:
+            key = ('aggregations', facet, 'buckets')
 
-    def generate_collections(self, path):
+            values = nested_get(key, results)
+
+            if values is not None and values:
+                facets[facet] = [x['key'] for x in values]
+
+        return facets
+
+    def get_elasticsearch_aggregation(self, path):
+        """
+        Repeated action of getting the aggregations at different levels depending on the specified file path
+        :param path: File path
+        :return: metadata dictionary representative of dataset. If all data found, gives:
+
+        {
+            'start_date': ...,
+            'end_date': ...,
+            'bbox': ...,
+            'facet1': ...,
+            'facet2': ...,
+        }
+        """
+
+        metadata = {}
 
         query = {
             "query": {
@@ -159,22 +223,57 @@ class CCI(CollectionHandler):
 
         # Add the facet aggregations
         for facet in self.facets:
-            query['aggs'][facet] = {'terms': f'project.opensearch.{facet}', 'size':1000}
+            query['aggs'][facet] = {'terms':{'field':f'projects.{self.project_name}.{facet}.keyword', 'size':1000}}
 
-        print(query)
+        result = self.es.search(index='opensearch-cci-test', body=query)
 
-        # result = self.es.search(index='', query=query)
-        #
-        # # Create top level collection
-        # top_collection = {
-        #     'collection_id': 'cci',
-        #     'title': 'CCI',
-        # }
-        #
-        # top_collection.update(self.get_temporal(result))
-        # top_collection.update(self.get_geospatial(result))
-        #
-        # # Create moles level collections
+        metadata.update(self._get_temporal(result))
+        metadata.update(self._get_geospatial(result))
+        metadata.update(self._get_collection_facets(result))
 
+        return metadata
+
+    def _generate_collections(self, index):
+        """
+        Collection level metadata is generated to map to MOLES datasets
+        :param path: File path
+        :return: None
+        """
+
+        collections = []
+
+        # Create top level collection
+        root_collection = {
+            'collection_id': self.collection_id,
+            'title': self.collection_title,
+            'path': self.collection_root
+        }
+
+        root_collection.update(self.get_elasticsearch_aggregation(self.collection_root))
+
+        collections.append(root_collection)
+
+        # Create moles level collections
+        # Get the moles datasets for the given path
+        moles_datasets = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?dataPath_prefix={self.collection_root}').json()
+
+        for dataset in moles_datasets:
+            metadata = {
+                'collection_id': dataset['uuid'],
+                'parent_identifier': self.collection_id,
+                'title': dataset['title'],
+                'path': dataset['result_field']['dataPath']
+            }
+
+            metadata.update(self.get_elasticsearch_aggregation(dataset['result_field']['dataPath']))
+            collections.append(metadata)
+
+        # Generate elasticsearch indexing metadata
+        for collection in collections:
+            yield {
+                '_index': index,
+                '_type': 'collection',
+                '_source': collection
+            }
 
 
