@@ -60,9 +60,7 @@ class CCI(CollectionHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        vocab_file = self.conf.get('cci', 'vocab_file')
-
-        self.pds = ProcessDatasets(suppress_file_output=True, filepath=vocab_file)
+        self.pds = ProcessDatasets(suppress_file_output=True)
 
         self.catalogue = CatalogueDatasets()
 
@@ -81,16 +79,7 @@ class CCI(CollectionHandler):
         :return: Dict  Facet:value pairs
         """
 
-        dataset_tags = {}
-
-        # Extract facets from the filename
-        drs, tags = self.pds._parse_file_name(os.path.dirname(path), path)
-        dataset_tags.update(drs)
-        # todo: SHOULD USE TAGS. Hint. MOLES: def resolve_vocab_term(vocab_service, uri):
-
-        # Extract facets from the file
-        drs, tags = self.pds._scan_net_cdf_file(path, os.path.dirname(path), tags.get(PROCESSING_LEVEL))
-        dataset_tags.update(drs)
+        dataset_tags = self.pds.get_tags_as_labels(path)
 
         # Translate between output from tagging code to map to named facets
         mapped_facets = {}
@@ -111,6 +100,9 @@ class CCI(CollectionHandler):
         if moles_info:
             mapped_facets['datasetId'] = moles_info['url'].split('uuid/')[-1]
 
+        # Set all newly tagged datasets to "not published" in opensearch
+        mapped_facets['publishedOS'] = False
+
         return mapped_facets
 
     @staticmethod
@@ -127,6 +119,27 @@ class CCI(CollectionHandler):
             if time is not None:
                 temporal[key] = time
 
+        # Generate date_range
+        start_date = nested_get(('aggregations', 'start_date', 'value_as_string'), results)
+        end_date = nested_get(('aggregations', 'end_date', 'value_as_string'), results)
+
+        dates = (start_date, end_date)
+
+        if not any(dates):
+            return {}
+
+        if all(dates):
+            temporal['time_frame'] = {
+                'gte': start_date,
+                'lte': end_date
+            }
+        else:
+            val = [x for x in dates if x == True]
+
+            temporal['time_frame'] = {
+                'gte': val,
+                'lte': val
+            }
         return temporal
 
     @staticmethod
@@ -159,6 +172,15 @@ class CCI(CollectionHandler):
 
         return geospatial
 
+    @staticmethod
+    def _get_file_formats(results):
+
+        facets = {}
+        values = nested_get(('aggregations', 'file_format', 'buckets'), results)
+
+        if values:
+            facets['fileFormat'] = [x['key'] for x in values]
+
     def _get_collection_facets(self, results):
         """
         Extracts the facet values from the elasticsearch response
@@ -173,7 +195,7 @@ class CCI(CollectionHandler):
 
             values = nested_get(key, results)
 
-            if values is not None and values:
+            if values:
                 facets[facet] = [x['key'] for x in values]
 
         return facets
@@ -196,16 +218,16 @@ class CCI(CollectionHandler):
         metadata = {}
 
         query = {
-            "query": {
-                "match_phrase_prefix": {
-                    "info.directory.analyzed": path
+            'query': {
+                'match_phrase_prefix': {
+                    'info.directory.analyzed': path
                 }
             },
-            "size": 0,
-            "aggs": {
-                "bbox": {
-                    "geo_bounds": {
-                        "field": "info.spatial.coordinates.coordinates"
+            'size': 0,
+            'aggs': {
+                'bbox': {
+                    'geo_bounds': {
+                        'field': 'info.spatial.coordinates.coordinates'
                     }
                 },
                 'start_date': {
@@ -217,6 +239,11 @@ class CCI(CollectionHandler):
                     'max': {
                         'field': 'info.temporal.end_time'
                     }
+                },
+                'file_format': {
+                    'terms': {
+                        'field': 'info.type.keyword'
+                    }
                 }
             }
         }
@@ -225,7 +252,7 @@ class CCI(CollectionHandler):
         for facet in self.facets:
             query['aggs'][facet] = {'terms':{'field':f'projects.{self.project_name}.{facet}.keyword', 'size':1000}}
 
-        result = self.es.search(index='opensearch-cci-test', body=query)
+        result = self.es.search(index='opensearch-cci-test-1', body=query)
 
         metadata.update(self._get_temporal(result))
         metadata.update(self._get_geospatial(result))

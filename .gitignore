@@ -5,5 +5,4 @@ __pycache__
 facet_scanner/tests/data
 *.egg-info
 cci_vocab
-test_cci_collections.py
-
+test_scripts/

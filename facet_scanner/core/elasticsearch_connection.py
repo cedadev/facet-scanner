@@ -10,6 +10,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import scan, bulk
+from elasticsearch.exceptions import RequestError
 
 
 class ElasticsearchConnection:
@@ -65,3 +66,17 @@ class ElasticsearchConnection:
 
     def search(self, *args, **kwargs):
         return self.es.search(*args, **kwargs)
+
+    def create_collections_index(self, index):
+        
+        return self.es.indices.create(index=index, ignore=400, body={
+            "mappings": {
+                "collection": {
+                    "properties": {
+                        "time_frame": {
+                            "type": "date_range"
+                        }
+                    }
+                }
+            }
+        })

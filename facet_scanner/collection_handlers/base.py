@@ -18,6 +18,7 @@ from facet_scanner.util import generator_grouper
 import time
 
 
+
 class CollectionHandler:
 
     @property
@@ -142,7 +143,7 @@ class CollectionHandler:
 
                 yield {
                     '_index': index,
-                    '_op_type': 'index',
+                    '_op_type': 'update',
                     '_id': id,
                     '_type': 'file',
                     'doc': {'projects': project}
@@ -162,6 +163,10 @@ class CollectionHandler:
         raise NotImplementedError
 
     def export_collections(self, index):
+
+        # Make sure the collections index exists with the date range mapping
+        self.es.create_collections_index(index)
+
         self.es.bulk(self._generate_collections, index, generator=True)
 
 
