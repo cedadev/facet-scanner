@@ -75,6 +75,13 @@ class ElasticsearchConnection:
                     "properties": {
                         "time_frame": {
                             "type": "date_range"
+                        },
+                        "bbox": {
+                            "properties": {
+                                "coordinates": {
+                                    "type": "geo_point"
+                                }
+                            }
                         }
                     }
                 }

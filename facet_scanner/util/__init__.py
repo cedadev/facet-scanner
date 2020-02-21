@@ -10,3 +10,4 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from .snippets import query_yes_no
 from .snippets import generator_grouper
+from .snippets import parse_key

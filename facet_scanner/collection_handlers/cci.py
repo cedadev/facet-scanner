@@ -11,9 +11,10 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 from facet_scanner.collection_handlers.base import CollectionHandler
 import os
 from cci_tagger.tagger import ProcessDatasets
-from cci_tagger.constants import PROCESSING_LEVEL
+from cci_tagger.conf.constants import PROCESSING_LEVEL
 from .util import CatalogueDatasets
 import requests
+from facet_scanner.util import parse_key
 
 def nested_get(key_list, input_dict):
     """
@@ -79,11 +80,11 @@ class CCI(CollectionHandler):
         :return: Dict  Facet:value pairs
         """
 
-        dataset_tags = self.pds.get_tags_as_labels(path)
+        tagged_dataset = self.pds.get_file_tags(path)
 
         # Translate between output from tagging code to map to named facets
         mapped_facets = {}
-        for tag_name, tag_value in dataset_tags.items():
+        for tag_name, tag_value in tagged_dataset.labels.items():
 
             # Get facet name
             for facet, tag_name_mapping in self.facets.items():
@@ -97,11 +98,10 @@ class CCI(CollectionHandler):
         # Get MOLES catalogue
         moles_info = self.catalogue.get_moles_record_metadata(path)
 
+        mapped_facets['drsId'] = tagged_dataset.drs
+
         if moles_info:
             mapped_facets['datasetId'] = moles_info['url'].split('uuid/')[-1]
-
-        # Set all newly tagged datasets to "not published" in opensearch
-        mapped_facets['publishedOS'] = False
 
         return mapped_facets
 
@@ -200,6 +200,29 @@ class CCI(CollectionHandler):
 
         return facets
 
+    @staticmethod
+    def _get_collection_variables(results):
+        """
+        Convert the aggreation into a dictionary of variables for opensearch
+        :param results:
+        :return:
+        """
+        response = {}
+        variables = []
+
+        # Get the aggregation buckets
+        key = ('aggregations', 'variables', 'buckets')
+        variable_buckets = nested_get(key, results)
+
+        for bucket in variable_buckets:
+            variable_dict = parse_key(bucket["key"])
+            variables.append(variable_dict)
+
+        if variables:
+            response['variables'] = variables
+
+        return response
+
     def get_elasticsearch_aggregation(self, path):
         """
         Repeated action of getting the aggregations at different levels depending on the specified file path
@@ -244,6 +267,12 @@ class CCI(CollectionHandler):
                     'terms': {
                         'field': 'info.type.keyword'
                     }
+                },
+                'variables': {
+                    'terms': {
+                        'field': 'info.phenomena.agg_string',
+                        'size': 1000
+                    }
                 }
             }
         }
@@ -252,11 +281,12 @@ class CCI(CollectionHandler):
         for facet in self.facets:
             query['aggs'][facet] = {'terms':{'field':f'projects.{self.project_name}.{facet}.keyword', 'size':1000}}
 
-        result = self.es.search(index='opensearch-cci-test-1', body=query)
+        result = self.es.search(index='opensearch-cci-test-2', body=query)
 
         metadata.update(self._get_temporal(result))
         metadata.update(self._get_geospatial(result))
         metadata.update(self._get_collection_facets(result))
+        metadata.update(self._get_collection_variables(result))
 
         return metadata
 
@@ -282,7 +312,7 @@ class CCI(CollectionHandler):
 
         # Create moles level collections
         # Get the moles datasets for the given path
-        moles_datasets = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?dataPath_prefix={self.collection_root}').json()
+        moles_datasets = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?dataPath_prefix={self.collection_root}&discoveryKeyword=ESACCI').json()
 
         for dataset in moles_datasets:
             metadata = {

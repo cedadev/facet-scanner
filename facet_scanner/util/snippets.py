@@ -11,6 +11,8 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 import sys
 import itertools
 import subprocess
+from collections import OrderedDict
+
 
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
@@ -49,6 +51,7 @@ def query_yes_no(question, default="yes"):
             sys.stdout.write('Please respond with "yes" or "no" '
                              '(or "y" or "n").\n')
 
+
 def generator_grouper(n, it):
     """
     Slices an iterator into smaller iterators of length n
@@ -69,3 +72,49 @@ def generator_grouper(n, it):
 
         # Join the first element back onto the next n elements
         yield itertools.chain((first_element,), chunk_it)
+
+
+def parse_key(key):
+    """
+    Convert a bucket key from the ES aggregation response to a dictionary.
+    The format is as follows:
+        - All keys and values are enclosed in double quotes (")
+        - key-value pairs are separated by ','
+        - key and value are separated by ':'
+        - if key is 'names' then value is a list separated with ';'
+    """
+    err_msg = "Invalid key '{}'".format(key)
+
+    d = {}
+    pairs = split_outside_quotes(key, ",")
+    for pair in pairs:
+
+        try:
+            label, val_str = split_outside_quotes(pair, ":")
+        except ValueError:
+            raise ValueError("{}: must be exactly 1 colon in key-value pair".format(err_msg))
+
+        try:
+            label = remove_quotes(label)
+            # Split val_str by ; to get list of values, remove quotes for each,
+            # and filter out empty values
+            val_list = [_f for _f in map(remove_quotes, split_outside_quotes(val_str, ";")) if _f]
+
+        except ValueError as ex:
+            raise ValueError("{}: {}".format(err_msg, ex))
+
+        if label == "names":
+            # Remove any duplicate names; can't use set() as we need
+            # to preserve the order for later comparison with CMMS content
+            # otherwise, if we use 'names' in the future as the display name
+            # this might alter
+            val_list = list(OrderedDict((x, True) for x in val_list).keys())
+
+            d[label] = val_list
+        else:
+            if len(val_list) > 1:
+                raise ValueError("{}: only 'names' can contains multiple values".format(err_msg))
+            if not val_list:
+                continue
+            d[label] = val_list[0]
+    return d
