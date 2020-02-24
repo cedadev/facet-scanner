@@ -98,7 +98,8 @@ class CCI(CollectionHandler):
         # Get MOLES catalogue
         moles_info = self.catalogue.get_moles_record_metadata(path)
 
-        mapped_facets['drsId'] = tagged_dataset.drs
+        if tagged_dataset.drs:
+            mapped_facets['drsId'] = tagged_dataset.drs
 
         if moles_info:
             mapped_facets['datasetId'] = moles_info['url'].split('uuid/')[-1]
