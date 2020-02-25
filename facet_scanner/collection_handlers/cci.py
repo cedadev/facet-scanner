@@ -42,7 +42,7 @@ class CCI(CollectionHandler):
 
     project_name = 'opensearch'
 
-    extensions = ['.nc']
+    extensions = []
 
     filters = []
 
