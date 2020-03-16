@@ -74,6 +74,40 @@ def generator_grouper(n, it):
         yield itertools.chain((first_element,), chunk_it)
 
 
+def split_outside_quotes(s, delim):
+    """
+    Split a string s by character delim, but only when delim is not enclosed
+    in double quotes.
+
+    Return a list of the split parts (including quotes if present)
+    """
+    parts = []
+    in_quotes = False
+    temp = ""
+
+    for char in s:
+        if not in_quotes and char == delim:
+            parts.append(temp)
+            temp = ""
+            continue
+
+        temp += char
+        if char == '"':
+            in_quotes = not in_quotes
+
+    if temp:
+        parts.append(temp)
+    return parts
+
+
+def remove_quotes(s):
+    """
+    Return a string s with enclosing double quotes removed.
+    """
+    if not s.startswith('"') or not s.endswith('"'):
+        raise ValueError("String '{}' is not wrapped in quotes".format(s))
+    return s[1:-1]
+
 def parse_key(key):
     """
     Convert a bucket key from the ES aggregation response to a dictionary.

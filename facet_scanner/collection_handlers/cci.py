@@ -9,12 +9,11 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.collection_handlers.base import CollectionHandler
-import os
 from cci_tagger.tagger import ProcessDatasets
-from cci_tagger.conf.constants import PROCESSING_LEVEL
 from .util import CatalogueDatasets
 import requests
 from facet_scanner.util import parse_key
+from tqdm import tqdm
 
 def nested_get(key_list, input_dict):
     """
@@ -55,7 +54,8 @@ class CCI(CollectionHandler):
             'ecv': None,
             'sensor': None,
             'platform': None,
-            'frequency': 'time_coverage_resolution'
+            'frequency': 'time_coverage_resolution',
+            'drsId': None
     }
 
     def __init__(self, *args, **kwargs):
@@ -282,7 +282,7 @@ class CCI(CollectionHandler):
         for facet in self.facets:
             query['aggs'][facet] = {'terms':{'field':f'projects.{self.project_name}.{facet}.keyword', 'size':1000}}
 
-        result = self.es.search(index='opensearch-cci-test-2', body=query)
+        result = self.es.search(index='opensearch-cci-files', body=query)
 
         metadata.update(self._get_temporal(result))
         metadata.update(self._get_geospatial(result))
@@ -313,9 +313,9 @@ class CCI(CollectionHandler):
 
         # Create moles level collections
         # Get the moles datasets for the given path
-        moles_datasets = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?dataPath_prefix={self.collection_root}&discoveryKeyword=ESACCI').json()
+        moles_datasets = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?discoveryKeyword=ESACCI').json()
 
-        for dataset in moles_datasets:
+        for dataset in tqdm(moles_datasets, desc='Looping MOLES datasets'):
             metadata = {
                 'collection_id': dataset['uuid'],
                 'parent_identifier': self.collection_id,
