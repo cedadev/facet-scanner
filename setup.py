@@ -68,7 +68,7 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            'facet_scanner = facet_scanner.scripts.facet_scanner_cmd:FacetScanner.main',
+            'facet_scanner = facet_scanner.scripts.facet_scanner_cmd:FacetExtractor.main',
         ]
     }
 )

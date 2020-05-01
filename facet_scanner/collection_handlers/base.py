@@ -14,12 +14,11 @@ import subprocess
 import json
 import importlib.util
 from tqdm import tqdm
-from facet_scanner.util import generator_grouper
+from facet_scanner.util import generator_grouper, Singleton
 import time
 
 
-
-class CollectionHandler:
+class CollectionHandler(metaclass=Singleton):
 
     @property
     def project_name(self):
@@ -41,18 +40,15 @@ class CollectionHandler:
     #   }
     filters = []
 
-    def __init__(self, host, http_auth, conf, **kwargs):
+    def __init__(self, **kwargs):
         """
         Create the elasticsearch connection
-        :param host: Elasticsearch Host
-        :param args: args to pass into the Elasticsearch connection class
         :param kwargs: kwargs to pass into the Elasticsearch connection class
         """
         # clean out extra arguments if they are there
         kwargs.pop('collection_root')
 
-        self.es = ElasticsearchConnection(host=host, http_auth=http_auth, **kwargs)
-        self.conf = conf
+        self.es = ElasticsearchConnection( **kwargs)
 
     def get_facets(self, path):
         """
@@ -145,8 +141,8 @@ class CollectionHandler:
                     '_index': index,
                     '_op_type': 'update',
                     '_id': id,
-                    '_type': 'file',
-                    'doc': {'projects': project}
+                    'doc': {'projects': project},
+                    'doc_as_upsert': True
 
                 }
 

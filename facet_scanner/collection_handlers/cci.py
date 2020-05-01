@@ -58,8 +58,8 @@ class CCI(CollectionHandler):
             'drsId': None
     }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.pds = ProcessDatasets(suppress_file_output=True)
 

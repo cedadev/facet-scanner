@@ -13,60 +13,32 @@ import argparse
 import os
 from configparser import RawConfigParser
 from facet_scanner.util import query_yes_no
+from facet_scanner.core.facet_scanner import FacetScanner
 
 
-class FacetScanner:
+class FacetExtractor(FacetScanner):
 
     def __init__(self, conf):
-        self.handler_factory = FacetFactory()
 
-        self.es_host = conf.get("elasticsearch", "host")
-        self.es_user = conf.get('elasticsearch', 'es_user')
-        self.es_password = conf.get('elasticsearch', 'es_password')
+        super().__init__()
+
+        self.es_password = conf.get('elasticsearch', 'api_key')
         self.index = conf.get('elasticsearch', 'target_index')
 
         print(
-            f'Host: {self.es_host} '
-            f'User: {self.es_user} '
             f'Index: {self.index} '
             f'Password: {"*******" if self.es_password is not None else None}'
         )
 
         query_yes_no('Check the above variables. Ready to continue?')
 
-    def get_handler(self, path, conf):
-        handler, collection_root = self.handler_factory.get_handler(path)
-
-        # Handle situation where handler not found
-        if handler is None:
-            raise NotImplementedError(
-                'The script was unable to find a match in facet_scanner.collection_handlers.util.collection_map.'
-                'Please update the mapping file.')
-
-        return handler(
-            host=self.es_host,
-            http_auth=(self.es_user, self.es_password),
-            conf=conf,
-            collection_root=collection_root
-        )
-
-    def get_collection(self, path):
-        """
-        Take a file path and return the top level collection file path as defined in the collection map
-        :param path: input filepath
-        :return: top level collection path
-        """
-        collection_details, collection_path = self.handler_factory.get_collection_map(path)
-
-        return collection_path
-
-    def process_path(self, cmd_args, conf):
+    def process_path(self, cmd_args):
         """
 
         :param cmd_args: Arguments from the command line
         """
         print('Getting handler...')
-        handler = self.get_handler(cmd_args.path, conf)
+        handler = self.get_handler(cmd_args.path, headers={'x-api-key': self.es_password})
         print(handler)
 
         print('Retrieving facets...')
@@ -105,7 +77,7 @@ class FacetScanner:
         scanner = cls(conf)
 
         # Run scanner
-        scanner.process_path(args, conf)
+        scanner.process_path(args)
 
 
 if __name__ == '__main__':

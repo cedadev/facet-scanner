@@ -8,15 +8,14 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from elasticsearch import Elasticsearch
 from elasticsearch.helpers import scan, bulk
-from elasticsearch.exceptions import RequestError
+from ceda_elasticsearch_tools.elasticsearch import CEDAElasticsearchClient
 
 
 class ElasticsearchConnection:
 
-    def __init__(self, host, *args, **kwargs):
-        self.es = Elasticsearch([host], *args, **kwargs)
+    def __init__(self, **kwargs):
+        self.es = CEDAElasticsearchClient(**kwargs)
 
     def get_hits(self, index, query=None):
         return scan(self.es, query=query, index=index)

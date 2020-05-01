@@ -31,7 +31,6 @@ class FacetFactory:
         if collection_details is not None:
             return locate(collection_details['handler']), collection_path
 
-
     def get_collection_map(self, path):
         """
         Takes an arbitrary path and returns a collection path

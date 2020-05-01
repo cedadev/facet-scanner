@@ -66,7 +66,7 @@ def generator_grouper(n, it):
 
         # Check if we have reached the end of the iterator
         try:
-            first_element =  next(chunk_it)
+            first_element = next(chunk_it)
         except StopIteration:
             return
 
@@ -107,6 +107,7 @@ def remove_quotes(s):
     if not s.startswith('"') or not s.endswith('"'):
         raise ValueError("String '{}' is not wrapped in quotes".format(s))
     return s[1:-1]
+
 
 def parse_key(key):
     """
@@ -152,3 +153,13 @@ def parse_key(key):
                 continue
             d[label] = val_list[0]
     return d
+
+
+class Singleton(type):
+    _instance = None
+
+    def __call__(self, *args, **kwargs):
+        if self._instance is  None:
+            self._instance = super().__call__(*args, **kwargs)
+
+        return self._instance
