@@ -61,7 +61,7 @@ class CCI(CollectionHandler):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.pds = ProcessDatasets(suppress_file_output=True)
+        self.pds = ProcessDatasets(suppress_file_output=True, **kwargs)
 
         self.catalogue = CatalogueDatasets()
 

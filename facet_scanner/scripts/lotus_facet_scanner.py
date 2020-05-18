@@ -8,15 +8,15 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.scripts.facet_scanner_cmd import FacetScanner
+from facet_scanner.scripts.facet_scanner_cmd import FacetExtractor
 import argparse
 import os
 import json
 
 
-class LotusFacetScanner(FacetScanner):
+class LotusFacetScanner(FacetExtractor):
 
-    def process_path(self, cmd_args, conf):
+    def process_path(self, cmd_args):
         """
 
         :param cmd_args: Arguments from the command line
@@ -30,7 +30,7 @@ class LotusFacetScanner(FacetScanner):
         print(f'Dataset path: {dataset_path}')
 
         print('Getting handler...')
-        handler = self.get_handler(dataset_path, conf)
+        handler = self.get_handler(dataset_path, headers={'x-api-key': self.es_password}, facet_json=self.facet_json)
         print(handler)
 
         print('Retrieving facets...')

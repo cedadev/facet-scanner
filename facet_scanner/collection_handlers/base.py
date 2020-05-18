@@ -47,6 +47,7 @@ class CollectionHandler(metaclass=Singleton):
         """
         # clean out extra arguments if they are there
         kwargs.pop('collection_root')
+        kwargs.pop('facet_json')
 
         self.es = ElasticsearchConnection( **kwargs)
 
@@ -92,12 +93,12 @@ class CollectionHandler(metaclass=Singleton):
 
             # Pause every 10 so as to not overwhelm the API
             if i and not i % 10:
-                print('Pausing for 1 mins')
-                time.sleep(60)
+                print('Pausing for 20 seconds')
+                time.sleep(20)
 
             script_path = importlib.util.find_spec('facet_scanner.scripts.lotus_facet_scanner').origin
             task = f'python {script_path} {filepath}'
-            command = f'bsub -W 24:00 -e errors/{file}.err {task}'
+            command = f'bsub -W 00:30 -e errors/{file}.err {task}'
 
             subprocess.run(command, shell=True)
 

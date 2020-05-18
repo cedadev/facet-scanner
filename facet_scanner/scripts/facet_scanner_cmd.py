@@ -24,6 +24,7 @@ class FacetExtractor(FacetScanner):
 
         self.es_password = conf.get('elasticsearch', 'api_key')
         self.index = conf.get('elasticsearch', 'target_index')
+        self.facet_json = conf.get('facet_scanner', 'facet_json', fallback=None)
 
         print(
             f'Index: {self.index} '
@@ -38,7 +39,7 @@ class FacetExtractor(FacetScanner):
         :param cmd_args: Arguments from the command line
         """
         print('Getting handler...')
-        handler = self.get_handler(cmd_args.path, headers={'x-api-key': self.es_password})
+        handler = self.get_handler(cmd_args.path, headers={'x-api-key': self.es_password}, facet_json=self.facet_json)
         print(handler)
 
         print('Retrieving facets...')
@@ -81,4 +82,4 @@ class FacetExtractor(FacetScanner):
 
 
 if __name__ == '__main__':
-    FacetScanner.main()
+    FacetExtractor.main()
