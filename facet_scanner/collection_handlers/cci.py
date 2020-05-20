@@ -14,8 +14,9 @@ from .util import CatalogueDatasets
 import requests
 from facet_scanner.util import parse_key
 from tqdm import tqdm
+import hashlib
 
-def nested_get(key_list, input_dict):
+def nested_get(key_list, input_dict, default=None):
     """
     Takes an iterable of keys and returns none if not found or the value
     :param key_list:
@@ -30,7 +31,7 @@ def nested_get(key_list, input_dict):
         if key != last_key:
             dict_nest = dict_nest.get(key, {})
         else:
-            return dict_nest.get(key)
+            return dict_nest.get(key, default)
 
 
 class CCI(CollectionHandler):
@@ -64,7 +65,6 @@ class CCI(CollectionHandler):
         self.pds = ProcessDatasets(suppress_file_output=True, **kwargs)
 
         self.catalogue = CatalogueDatasets()
-
 
         if kwargs['collection_root'] is not None:
             self.collection_root = kwargs['collection_root']
@@ -215,16 +215,17 @@ class CCI(CollectionHandler):
         key = ('aggregations', 'variables', 'buckets')
         variable_buckets = nested_get(key, results)
 
-        for bucket in variable_buckets:
-            variable_dict = parse_key(bucket["key"])
-            variables.append(variable_dict)
+        if variable_buckets:
+            for bucket in variable_buckets:
+                variable_dict = parse_key(bucket["key"])
+                variables.append(variable_dict)
 
-        if variables:
-            response['variables'] = variables
+            if variables:
+                response['variables'] = variables
 
         return response
 
-    def get_elasticsearch_aggregation(self, path):
+    def get_elasticsearch_aggregation(self, path, variables=True):
         """
         Repeated action of getting the aggregations at different levels depending on the specified file path
         :param path: File path
@@ -268,21 +269,22 @@ class CCI(CollectionHandler):
                     'terms': {
                         'field': 'info.type.keyword'
                     }
-                },
-                'variables': {
+                }
+            }
+        }
+
+        if variables:
+            query['aggs']['variables'] = {
                     'terms': {
                         'field': 'info.phenomena.agg_string',
                         'size': 1000
                     }
                 }
-            }
-        }
-
         # Add the facet aggregations
         for facet in self.facets:
             query['aggs'][facet] = {'terms':{'field':f'projects.{self.project_name}.{facet}.keyword', 'size':1000}}
 
-        result = self.es.search(index='opensearch-cci-files', body=query)
+        result = self.es.search(index='opensearch-files', body=query, request_timeout=60)
 
         metadata.update(self._get_temporal(result))
         metadata.update(self._get_geospatial(result))
@@ -304,34 +306,41 @@ class CCI(CollectionHandler):
         root_collection = {
             'collection_id': self.collection_id,
             'title': self.collection_title,
-            'path': self.collection_root
+            'path': self.collection_root,
+            '__id': hashlib.sha1(self.collection_id.encode()).hexdigest()
         }
 
-        root_collection.update(self.get_elasticsearch_aggregation(self.collection_root))
-
-        collections.append(root_collection)
+        root_collection.update(self.get_elasticsearch_aggregation(self.collection_root, variables=False))
 
         # Create moles level collections
         # Get the moles datasets for the given path
-        moles_datasets = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?discoveryKeyword=ESACCI').json()
+        r = requests.get(f'http://catalogue.ceda.ac.uk/api/v1/observations.json?discoveryKeyword=ESACCI')
+
+        moles_datasets = r.json()
 
         for dataset in tqdm(moles_datasets, desc='Looping MOLES datasets'):
             metadata = {
                 'collection_id': dataset['uuid'],
                 'parent_identifier': self.collection_id,
                 'title': dataset['title'],
-                'path': dataset['result_field']['dataPath']
+                'path': dataset['result_field']['dataPath'],
+                'is_published': True,
+                '__id': dataset['uuid']
             }
 
             metadata.update(self.get_elasticsearch_aggregation(dataset['result_field']['dataPath']))
             collections.append(metadata)
 
+        collections.append(root_collection)
+
         # Generate elasticsearch indexing metadata
         for collection in collections:
+            id = collection.pop('__id')
             yield {
                 '_index': index,
-                '_type': 'collection',
+                '_id': id,
                 '_source': collection
+
             }
 
 

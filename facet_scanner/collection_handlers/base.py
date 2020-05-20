@@ -47,7 +47,7 @@ class CollectionHandler(metaclass=Singleton):
         """
         # clean out extra arguments if they are there
         kwargs.pop('collection_root')
-        kwargs.pop('facet_json')
+        kwargs.pop('facet_json', None)
 
         self.es = ElasticsearchConnection( **kwargs)
 

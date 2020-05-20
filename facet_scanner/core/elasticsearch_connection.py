@@ -70,16 +70,14 @@ class ElasticsearchConnection:
         
         return self.es.indices.create(index=index, ignore=400, body={
             "mappings": {
-                "collection": {
-                    "properties": {
-                        "time_frame": {
-                            "type": "date_range"
-                        },
-                        "bbox": {
-                            "properties": {
-                                "coordinates": {
-                                    "type": "geo_point"
-                                }
+                "properties": {
+                    "time_frame": {
+                        "type": "date_range"
+                    },
+                    "bbox": {
+                        "properties": {
+                            "coordinates": {
+                                "type": "geo_point"
                             }
                         }
                     }
