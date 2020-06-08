@@ -16,6 +16,7 @@ from facet_scanner.util import parse_key
 from tqdm import tqdm
 import hashlib
 
+
 def nested_get(key_list, input_dict, default=None):
     """
     Takes an iterable of keys and returns none if not found or the value
@@ -47,17 +48,17 @@ class CCI(CollectionHandler):
     filters = []
 
     facets = {
-            'institute': 'institution',
-            'productVersion': 'product_version',
-            'productString': 'product_string',
-            'processingLevel': 'processing_level',
-            'dataType': 'data_type',
-            'ecv': None,
-            'sensor': None,
-            'platform': None,
-            'platformGroup': 'platform_group',
-            'frequency': 'time_coverage_resolution',
-            'drsId': None
+        'institute': 'institution',
+        'productVersion': 'product_version',
+        'productString': 'product_string',
+        'processingLevel': 'processing_level',
+        'dataType': 'data_type',
+        'ecv': None,
+        'sensor': None,
+        'platform': None,
+        'platformGroup': 'platform_group',
+        'frequency': 'time_coverage_resolution',
+        'drsId': None
     }
 
     def __init__(self, **kwargs):
@@ -159,10 +160,10 @@ class CCI(CollectionHandler):
 
         geospatial = {}
 
-        top_left_lon = nested_get(('aggregations','bbox','bounds','top_left','lon'), results)
-        top_left_lat = nested_get(('aggregations','bbox','bounds','top_left','lat'), results)
-        bottom_right_lon = nested_get(('aggregations','bbox','bounds','bottom_right','lon'), results)
-        bottom_right_lat = nested_get(('aggregations','bbox','bounds','bottom_right','lat'), results)
+        top_left_lon = nested_get(('aggregations', 'bbox', 'bounds', 'top_left', 'lon'), results)
+        top_left_lat = nested_get(('aggregations', 'bbox', 'bounds', 'top_left', 'lat'), results)
+        bottom_right_lon = nested_get(('aggregations', 'bbox', 'bounds', 'bottom_right', 'lon'), results)
+        bottom_right_lat = nested_get(('aggregations', 'bbox', 'bounds', 'bottom_right', 'lat'), results)
 
         if results['aggregations']['bbox']:
             geospatial = {
@@ -226,7 +227,38 @@ class CCI(CollectionHandler):
 
         return response
 
-    def get_elasticsearch_aggregation(self, path, variables=True):
+    def _get_dataset_aggregations(self, results):
+
+        aggregations = []
+
+        # Get DRS IDs
+        key = ('aggregations', 'drsId', 'buckets')
+        drs_ids = nested_get(key, results)
+
+        if drs_ids:
+
+            # Generate a list of hashes to query the aggregation state store
+            ids = [hashlib.sha1(id['key'].encode('utf-8')).hexdigest() for id in drs_ids]
+
+            # Query the state store for the current aggregations
+            agg_state = self.es.mget(index='opensearch-aggregation-state', body={'ids': ids}, _source=True)
+
+            # Check the results to see which drs appear in the state store
+            for doc in agg_state['docs']:
+                if doc['found']:
+                    agg = {
+                        'id': doc['_source']['id']
+                    }
+
+                    if doc['_source']['wms']:
+                        agg['wms'] = True
+                        agg['wcs'] = True
+
+                    aggregations.append(agg)
+
+        return {'aggregations': aggregations}
+
+    def get_elasticsearch_aggregation(self, path, variables=True, aggregations=True):
         """
         Repeated action of getting the aggregations at different levels depending on the specified file path
         :param path: File path
@@ -276,14 +308,14 @@ class CCI(CollectionHandler):
 
         if variables:
             query['aggs']['variables'] = {
-                    'terms': {
-                        'field': 'info.phenomena.agg_string',
-                        'size': 1000
-                    }
+                'terms': {
+                    'field': 'info.phenomena.agg_string',
+                    'size': 1000
                 }
+            }
         # Add the facet aggregations
         for facet in self.facets:
-            query['aggs'][facet] = {'terms':{'field':f'projects.{self.project_name}.{facet}.keyword', 'size':1000}}
+            query['aggs'][facet] = {'terms': {'field': f'projects.{self.project_name}.{facet}.keyword', 'size': 1000}}
 
         result = self.es.search(index='opensearch-files', body=query, request_timeout=60)
 
@@ -291,6 +323,9 @@ class CCI(CollectionHandler):
         metadata.update(self._get_geospatial(result))
         metadata.update(self._get_collection_facets(result))
         metadata.update(self._get_collection_variables(result))
+
+        if aggregations:
+            metadata.update(self._get_dataset_aggregations(result))
 
         return metadata
 
@@ -311,7 +346,7 @@ class CCI(CollectionHandler):
             '__id': hashlib.sha1(self.collection_id.encode()).hexdigest()
         }
 
-        root_collection.update(self.get_elasticsearch_aggregation(self.collection_root, variables=False))
+        root_collection.update(self.get_elasticsearch_aggregation(self.collection_root, variables=False, aggregations=False))
 
         # Create moles level collections
         # Get the moles datasets for the given path
@@ -343,5 +378,3 @@ class CCI(CollectionHandler):
                 '_source': collection
 
             }
-
-
