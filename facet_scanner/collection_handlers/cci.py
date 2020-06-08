@@ -247,12 +247,14 @@ class CCI(CollectionHandler):
             for doc in agg_state['docs']:
                 if doc['found']:
                     agg = {
-                        'id': doc['_source']['id']
+                        'id': doc['_source']['id'],
+                        'services': [
+                            'opendap'
+                        ]
                     }
 
                     if doc['_source']['wms']:
-                        agg['wms'] = True
-                        agg['wcs'] = True
+                        agg['services'].extend(['wms','wcs'])
 
                     aggregations.append(agg)
 
