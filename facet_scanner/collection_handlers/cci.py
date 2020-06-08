@@ -55,6 +55,7 @@ class CCI(CollectionHandler):
             'ecv': None,
             'sensor': None,
             'platform': None,
+            'platformGroup': 'platform_group',
             'frequency': 'time_coverage_resolution',
             'drsId': None
     }
