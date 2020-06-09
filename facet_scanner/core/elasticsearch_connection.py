@@ -8,21 +8,23 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from elasticsearch import Elasticsearch
-from elasticsearch.helpers import scan, bulk, parallel_bulk
-from collections import deque
+from elasticsearch.helpers import scan, bulk
+from ceda_elasticsearch_tools.elasticsearch import CEDAElasticsearchClient
 
 
 class ElasticsearchConnection:
 
-    def __init__(self, host, *args, **kwargs):
-        self.es = Elasticsearch([host], *args, **kwargs)
+    def __init__(self, **kwargs):
+        self.es = CEDAElasticsearchClient(**kwargs)
 
     def get_hits(self, index, query=None):
         return scan(self.es, query=query, index=index)
 
     def get_query(self, extensions, path, excludes=[]):
         query_base = {
+            "_source": {
+                "exclude": ["info.phenomena"]
+            },
             "query": {
                 "bool": {
                     "must": [
@@ -32,7 +34,7 @@ class ElasticsearchConnection:
                             }
                         }
                     ],
-                    "must_not":[],
+                    "must_not": [],
                     "filter": []
                 }
             }
@@ -54,11 +56,34 @@ class ElasticsearchConnection:
 
     def bulk(self, iterator, *args, generator=False):
         if generator:
-            deque(
-                parallel_bulk(self.es, iterator(*args))
-            )
+                bulk(self.es, iterator(*args))
         else:
             bulk(self.es, iterator)
 
     def count(self, *args, **kwargs):
         return self.es.count(*args, **kwargs).get('count')
+
+    def mget(self, *args, **kwargs):
+        return self.es.mget(*args, **kwargs)
+
+    def search(self, *args, **kwargs):
+        return self.es.search(*args, **kwargs)
+
+    def create_collections_index(self, index):
+        
+        return self.es.indices.create(index=index, ignore=400, body={
+            "mappings": {
+                "properties": {
+                    "time_frame": {
+                        "type": "date_range"
+                    },
+                    "bbox": {
+                        "properties": {
+                            "coordinates": {
+                                "type": "geo_point"
+                            }
+                        }
+                    }
+                }
+            }
+        })

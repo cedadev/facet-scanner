@@ -23,7 +23,7 @@ with open("README.md") as readme_file:
     _long_description = readme_file.read()
 
 setup(
-    name='facet-scanner',
+    name='facet_scanner',
     version=_package_version,
     description='Extracts facets from datasets to add to elasticsearch',
     author='Richard Smith',
@@ -68,7 +68,7 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            'facet_scanner = facet_scanner.scripts.facet_scanner:FacetScanner.main'
+            'facet_scanner = facet_scanner.scripts.facet_scanner_cmd:FacetExtractor.main',
         ]
     }
 )

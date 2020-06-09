@@ -27,10 +27,9 @@ class FacetFactory:
         :return: granule extension, handler class
         """
 
-        collection = self.get_collection_map(path)
-        if collection is not None:
-            return locate(collection['handler'])
-
+        collection_details, collection_path = self.get_collection_map(path)
+        if collection_details is not None:
+            return locate(collection_details['handler']), collection_path
 
     def get_collection_map(self, path):
         """
@@ -47,7 +46,7 @@ class FacetFactory:
 
         # No match has been found
         if path == '/':
-            return None
+            return None, None
 
-        return self.map[path]
+        return self.map[path], path
 
