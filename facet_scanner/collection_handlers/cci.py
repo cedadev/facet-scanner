@@ -254,7 +254,7 @@ class CCI(CollectionHandler):
                     }
 
                     if doc['_source']['wms']:
-                        agg['services'].extend(['wms','wcs'])
+                        agg['services'].extend(['wms', 'wcs'])
 
                     aggregations.append(agg)
 
@@ -340,16 +340,6 @@ class CCI(CollectionHandler):
 
         collections = []
 
-        # Create top level collection
-        root_collection = {
-            'collection_id': self.collection_id,
-            'title': self.collection_title,
-            'path': self.collection_root,
-            '__id': hashlib.sha1(self.collection_id.encode()).hexdigest()
-        }
-
-        root_collection.update(self.get_elasticsearch_aggregation(self.collection_root, variables=False, aggregations=False))
-
         # Create moles level collections
         # Get the moles datasets for the given path
         r = requests.get(f'http://catalogue.ceda.ac.uk/api/v1/observations.json?discoveryKeyword=ESACCI')
@@ -369,10 +359,84 @@ class CCI(CollectionHandler):
             metadata.update(self.get_elasticsearch_aggregation(dataset['result_field']['dataPath']))
             collections.append(metadata)
 
-        collections.append(root_collection)
-
         # Generate elasticsearch indexing metadata
         for collection in collections:
+            id = collection.pop('__id')
+            yield {
+                '_index': index,
+                '_id': id,
+                '_source': collection
+
+            }
+
+    def _generate_root_collections(self, index):
+        # Create top level collection
+        root_collections = []
+
+        root_collection = {
+            'collection_id': self.collection_id,
+            'title': self.collection_title,
+            'path': self.collection_root,
+            '__id': hashlib.sha1(self.collection_id.encode()).hexdigest()
+        }
+
+        metadata = {}
+
+        query = {
+            'query': {
+                'bool': {
+                    'must': [
+                        {
+                            'term': {
+                                'is_published': True
+                            }
+                        }
+                    ],
+                    'must_not': [
+                        {
+                            'term': {
+                                'collection_id.keyword': 'cci'
+                            }
+                        }
+                    ]
+                }
+            },
+            'size': 0,
+            'aggs': {
+                'bbox': {
+                    'geo_bounds': {
+                        'field': 'bbox.coordinates'
+                    }
+                },
+                'start_date': {
+                    'min': {
+                        'field': 'start_date'
+                    }
+                },
+                'end_date': {
+                    'max': {
+                        'field': 'end_date'
+                    }
+                }
+            }
+        }
+
+        # Add the facet aggregations
+        for facet in self.facets:
+            query['aggs'][facet] = {'terms': {'field': f'{facet}.keyword', 'size': 1000}}
+
+        result = self.es.search(index=index, body=query, request_timeout=60)
+
+        metadata.update(self._get_temporal(result))
+        metadata.update(self._get_geospatial(result))
+        metadata.update(self._get_collection_facets(result))
+        metadata.update(self._get_collection_variables(result))
+
+        root_collection.update(metadata)
+
+        root_collections.append(root_collection)
+
+        for collection in root_collections:
             id = collection.pop('__id')
             yield {
                 '_index': index,

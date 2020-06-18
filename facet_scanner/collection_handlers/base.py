@@ -155,7 +155,15 @@ class CollectionHandler(metaclass=Singleton):
         """
         Optional handle to enable different handling of collections between datasets.
         Returns None and handles indexing of the relevant metadata.
-        :param path: File path being processed
+        :param index: Name of the collection index
+        """
+        raise NotImplementedError
+
+    def _generate_root_collections(self, index):
+        """
+        Optional handle to enable different handling of collections between datasets.
+        Returns None and handles indexing of the relevant metadata.
+        :param index: Name of the collection index
         """
         raise NotImplementedError
 
@@ -165,6 +173,7 @@ class CollectionHandler(metaclass=Singleton):
         self.es.create_collections_index(index)
 
         self.es.bulk(self._generate_collections, index, generator=True)
+        self.es.bulk(self._generate_root_collections, index, generator=True)
 
 
 
