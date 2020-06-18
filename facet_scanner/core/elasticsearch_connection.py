@@ -56,9 +56,9 @@ class ElasticsearchConnection:
 
     def bulk(self, iterator, *args, generator=False):
         if generator:
-                bulk(self.es, iterator(*args))
+                bulk(self.es, iterator(*args), refresh=True)
         else:
-            bulk(self.es, iterator)
+            bulk(self.es, iterator, refresh=True)
 
     def count(self, *args, **kwargs):
         return self.es.count(*args, **kwargs).get('count')
