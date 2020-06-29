@@ -342,7 +342,7 @@ class CCI(CollectionHandler):
 
         # Create moles level collections
         # Get the moles datasets for the given path
-        r = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?discoveryKeyword=ESACCI')
+        r = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?discoveryKeyword=ESACCI&limit=300')
 
         moles_datasets = r.json()['results']
 
