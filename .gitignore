@@ -6,3 +6,4 @@ facet_scanner/tests/data
 *.egg-info
 cci_vocab
 test_scripts/
+*.ini

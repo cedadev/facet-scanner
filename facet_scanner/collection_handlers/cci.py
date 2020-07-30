@@ -15,6 +15,7 @@ import requests
 from facet_scanner.util import parse_key
 from tqdm import tqdm
 import hashlib
+from facet_scanner.collection_handlers.util import generate_id
 
 
 def nested_get(key_list, input_dict, default=None):
@@ -102,9 +103,22 @@ class CCI(CollectionHandler):
 
         if tagged_dataset.drs:
             mapped_facets['drsId'] = tagged_dataset.drs
+            mapped_facets['datasetId'] = [generate_id(tagged_dataset.drs)]
 
         if moles_info:
-            mapped_facets['datasetId'] = moles_info['url'].split('uuid/')[-1]
+            # Get any ids which already exist from drs
+            dsid = mapped_facets.get('datasetId',[])
+            moles_uuid = moles_info["url"].split("uuid/")[-1]
+
+            # Need to add file to {uuid}.all dataset
+            if tagged_dataset.drs:
+                dsid.extend([
+                    generate_id(f'{moles_uuid}.all')
+                ])
+            else:
+                dsid.extend([moles_uuid])
+
+            mapped_facets['datasetId'] = dsid
 
         return mapped_facets
 
@@ -241,7 +255,7 @@ class CCI(CollectionHandler):
         if drs_ids:
 
             # Generate a list of hashes to query the aggregation state store
-            ids = [hashlib.sha1(id['key'].encode('utf-8')).hexdigest() for id in drs_ids]
+            ids = [generate_id(id['key']) for id in drs_ids]
 
             # Query the state store for the current aggregations
             agg_state = self.es.mget(index='opensearch-aggregation-state', body={'ids': ids}, _source=True)
@@ -263,10 +277,13 @@ class CCI(CollectionHandler):
 
         return {'aggregations': aggregations}
 
-    def get_elasticsearch_aggregation(self, path, variables=True, aggregations=True):
+    def get_elasticsearch_aggregation(self, path: str, variables=True, aggregations=True, extra_query_clauses=None):
         """
         Repeated action of getting the aggregations at different levels depending on the specified file path
         :param path: File path
+        :param variables: Whether or not to aggregate variables
+        :param aggregations: Whether or not to build aggregation list
+        :param extra_query_clauses: Any extra query segments to be added to bool query
         :return: metadata dictionary representative of dataset. If all data found, gives:
 
         {
@@ -282,8 +299,14 @@ class CCI(CollectionHandler):
 
         query = {
             'query': {
-                'match_phrase_prefix': {
-                    'info.directory.analyzed': path
+                'bool': {
+                    'must': [
+                        {
+                            'match_phrase_prefix': {
+                                'info.directory.analyzed': path
+                            }
+                        }
+                    ]
                 }
             },
             'size': 0,
@@ -318,6 +341,11 @@ class CCI(CollectionHandler):
                     'size': 1000
                 }
             }
+
+        # Add any extra query clauses
+        if extra_query_clauses:
+            for clause in extra_query_clauses:
+                query['query']['bool']['must'].append(clause)
 
         # Add the facet aggregations
         for facet in self.facets:
@@ -363,6 +391,48 @@ class CCI(CollectionHandler):
 
             metadata.update(self.get_elasticsearch_aggregation(dataset['result_field']['dataPath']))
             collections.append(metadata)
+
+            # Get drs datasets within MOLES datasets
+            drs_datasets = metadata.get('drsId', [])
+
+            # If we are adding another level, then need to add a "collection" for all files
+            if drs_datasets:
+                drs_datasets.append('_all')
+
+            for drs in drs_datasets:
+
+                # Need to make a unique identifier for _all collection
+                if drs == '_all':
+                    id = generate_id(f'{dataset["uuid"]}.all')
+                else:
+                    id = generate_id(drs)
+
+                metadata = {
+                    'collection_id': id,
+                    'parent_identifier': dataset['uuid'],
+                    'title': drs if drs != '_all' else 'All Files',
+                    'path': dataset['result_field']['dataPath'],
+                    'is_published': True,
+                    '__id': id
+                }
+
+                # Don't want a drs filter on the files when doing _all
+                if drs != '_all':
+                    metadata.update(
+                        self.get_elasticsearch_aggregation(
+                            dataset['result_field']['dataPath'],
+                            extra_query_clauses=[
+                                {'term': {f'projects.{self.project_name}.drsId.keyword': drs}}
+                            ]
+                        )
+                    )
+                else:
+                    metadata.update(
+                        self.get_elasticsearch_aggregation(
+                            dataset['result_field']['dataPath']
+                        )
+                    )
+                collections.append(metadata)
 
         # Generate elasticsearch indexing metadata
         for collection in collections:
