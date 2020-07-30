@@ -179,10 +179,12 @@ class CCI(CollectionHandler):
     def _get_file_formats(results):
 
         facets = {}
-        values = nested_get(('aggregations', 'file_format', 'buckets'), results)
+        values = nested_get(('aggregations', 'fileFormat', 'buckets'), results)
 
         if values:
             facets['fileFormat'] = [x['key'] for x in values]
+
+        return facets
 
     def _get_collection_facets(self, results):
         """
@@ -214,16 +216,17 @@ class CCI(CollectionHandler):
         variables = []
 
         # Get the aggregation buckets
-        key = ('aggregations', 'variables', 'buckets')
+        key = ('aggregations', 'variable', 'buckets')
         variable_buckets = nested_get(key, results)
 
         if variable_buckets:
             for bucket in variable_buckets:
-                variable_dict = parse_key(bucket["key"])
+                variable_dict = parse_key(bucket['key'])
+                variable_dict['agg_string'] = bucket['key']
                 variables.append(variable_dict)
 
             if variables:
-                response['variables'] = variables
+                response['variable'] = variables
 
         return response
 
@@ -300,7 +303,7 @@ class CCI(CollectionHandler):
                         'field': 'info.temporal.end_time'
                     }
                 },
-                'file_format': {
+                'fileFormat': {
                     'terms': {
                         'field': 'info.type.keyword'
                     }
@@ -309,12 +312,13 @@ class CCI(CollectionHandler):
         }
 
         if variables:
-            query['aggs']['variables'] = {
+            query['aggs']['variable'] = {
                 'terms': {
                     'field': 'info.phenomena.agg_string',
                     'size': 1000
                 }
             }
+
         # Add the facet aggregations
         for facet in self.facets:
             query['aggs'][facet] = {'terms': {'field': f'projects.{self.project_name}.{facet}.keyword', 'size': 1000}}
@@ -324,6 +328,7 @@ class CCI(CollectionHandler):
         metadata.update(self._get_temporal(result))
         metadata.update(self._get_geospatial(result))
         metadata.update(self._get_collection_facets(result))
+        metadata.update(self._get_file_formats(result))
         metadata.update(self._get_collection_variables(result))
 
         if aggregations:
