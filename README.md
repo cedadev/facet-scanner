@@ -1,6 +1,7 @@
 # CEDA Facet Scanner
 
 Takes datasets and extracts the facets from the files/filepath.
+The scanner works to map a file path to the specific handler for that collection of files. For example, ESA CCI datasets are scanned by the cci handler. This is because each collection of datasets will have different characteristics and will need to be treated in a different way.
 
 
 ## Running the code
@@ -20,3 +21,6 @@ Optional:
 | Option   | No. Arguments | Description |
 | -------- | :-------------------: | ------ |
 | `--conf` | 1                   | Allows you to set a different location for the config file.This defaults to `../conf/facet_scanner.ini` relative to the script. |
+
+
+## Adding a new Collection
