@@ -30,11 +30,17 @@ class LotusFacetScanner(FacetExtractor):
         print(f'Dataset path: {dataset_path}')
 
         print('Getting handler...')
-        handler = self.get_handler(dataset_path, headers={'x-api-key': self.es_password}, facet_json=self.facet_json)
+        handler = self.get_handler(dataset_path, headers={'x-api-key': self.es_password}, facet_json=self.facet_json, moles_mapping = self.moles_mapping)
         print(handler)
 
         print('Retrieving facets...')
         handler.update_facets(cmd_args.path, self.index)
+
+        # Remove file once processed
+        if os.path.exists(cmd_args.path):
+            os.remove(cmd_args.path)
+        else:
+            print(f'{cmd_args.path} does not exist')
 
     @staticmethod
     def _get_command_line_args():

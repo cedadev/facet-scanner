@@ -8,7 +8,6 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.collection_handlers.util import FacetFactory
 import argparse
 import os
 from configparser import RawConfigParser
@@ -25,6 +24,7 @@ class FacetExtractor(FacetScanner):
         self.es_password = conf.get('elasticsearch', 'api_key')
         self.index = conf.get('elasticsearch', 'target_index')
         self.facet_json = conf.get('facet_scanner', 'facet_json', fallback=None)
+        self.moles_mapping = conf.get('facet_scanner', 'moles_mapping', fallback=None)
 
         print(
             f'Index: {self.index} '
@@ -43,12 +43,7 @@ class FacetExtractor(FacetScanner):
         print(handler)
 
         print('Retrieving facets...')
-        handler.export_facets(cmd_args.path, self.index, cmd_args.processing_path, rerun=cmd_args.rerun, batch_size=cmd_args.num_files)
-
-        # try:
-        #     handler.export_collections(cmd_args.path)
-        # except NotImplementedError:
-        #     print(f'Collection generator not implemented for {handler}')
+        handler.export_facets(cmd_args.path, self.index, cmd_args.processing_path, rerun=cmd_args.rerun, batch_size=cmd_args.num_files, lotus=cmd_args.no_run)
 
     @staticmethod
     def _get_command_line_args():
@@ -56,6 +51,7 @@ class FacetExtractor(FacetScanner):
         parser = argparse.ArgumentParser(description='Process path for facets and update the index')
         parser.add_argument('path', type=str, help='Path to process')
         parser.add_argument('processing_path', type=str, help='Path to output intermediate files')
+        parser.add_argument('--no-run', action='store_false', dest='no_run', help='Disables the run on lotus. Can be used just to build the output lists.')
         parser.add_argument('--rerun', action='store_true', help='Disable paging to disk on rerun')
         parser.add_argument('--num-files', dest='num_files', type=int, help='Number of files per lotus job',
                             default=500)

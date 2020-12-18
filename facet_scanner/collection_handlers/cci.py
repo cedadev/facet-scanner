@@ -65,9 +65,9 @@ class CCI(CollectionHandler):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.pds = ProcessDatasets(suppress_file_output=True, **kwargs)
+        self.catalogue = CatalogueDatasets(moles_mapping=kwargs.pop('moles_mapping', None))
 
-        self.catalogue = CatalogueDatasets()
+        self.pds = ProcessDatasets(suppress_file_output=True, **kwargs)
 
         if kwargs['collection_root'] is not None:
             self.collection_root = kwargs['collection_root']
@@ -109,15 +109,7 @@ class CCI(CollectionHandler):
             # Get any ids which already exist from drs
             dsid = mapped_facets.get('datasetId',[])
             moles_uuid = moles_info["url"].split("uuid/")[-1]
-
-            # Need to add file to {uuid}.all dataset
-            if tagged_dataset.drs:
-                dsid.extend([
-                    generate_id(f'{moles_uuid}.all')
-                ])
-            else:
-                dsid.extend([moles_uuid])
-
+            dsid.extend([moles_uuid])
             mapped_facets['datasetId'] = dsid
 
         return mapped_facets
@@ -277,9 +269,10 @@ class CCI(CollectionHandler):
 
         return {'aggregations': aggregations}
 
-    def get_elasticsearch_aggregation(self, path: str, variables=True, aggregations=True, extra_query_clauses=None):
+    def get_elasticsearch_aggregation(self,source_index, path: str, variables=True, aggregations=True, extra_query_clauses=None):
         """
         Repeated action of getting the aggregations at different levels depending on the specified file path
+        :param source_index: The name of the index containing the files
         :param path: File path
         :param variables: Whether or not to aggregate variables
         :param aggregations: Whether or not to build aggregation list
@@ -351,7 +344,7 @@ class CCI(CollectionHandler):
         for facet in self.facets:
             query['aggs'][facet] = {'terms': {'field': f'projects.{self.project_name}.{facet}.keyword', 'size': 1000}}
 
-        result = self.es.search(index='opensearch-files', body=query, request_timeout=60)
+        result = self.es.search(index=source_index, body=query, request_timeout=60)
 
         metadata.update(self._get_temporal(result))
         metadata.update(self._get_geospatial(result))
@@ -364,7 +357,7 @@ class CCI(CollectionHandler):
 
         return metadata
 
-    def _generate_collections(self, index):
+    def _generate_collections(self, source_index, dest_index):
         """
         Collection level metadata is generated to map to MOLES datasets
         :param path: File path
@@ -386,10 +379,22 @@ class CCI(CollectionHandler):
                 'title': dataset['title'],
                 'path': dataset['result_field']['dataPath'],
                 'is_published': True,
-                '__id': dataset['uuid']
+                '__id': dataset['uuid'],
+                'links': {
+                    'describedby': [
+                        {
+                            'title': 'ISO19115',
+                            'href': f'https://catalogue.ceda.ac.uk/export/xml/{dataset["uuid"]}.xml'
+                        },
+                        {
+                            'title': 'Dataset Information',
+                            'href': f'https://catalogue.ceda.ac.uk/uuid/{dataset["uuid"]}'
+                        }
+                    ]
+                }
             }
 
-            metadata.update(self.get_elasticsearch_aggregation(dataset['result_field']['dataPath']))
+            metadata.update(self.get_elasticsearch_aggregation(source_index, dataset['result_field']['dataPath']))
             collections.append(metadata)
 
             # Get drs datasets within MOLES datasets
@@ -403,7 +408,7 @@ class CCI(CollectionHandler):
 
                 # Need to make a unique identifier for _all collection
                 if drs == '_all':
-                    id = generate_id(f'{dataset["uuid"]}.all')
+                    id = f'{dataset["uuid"]}.all'
                 else:
                     id = generate_id(drs)
 
@@ -413,13 +418,22 @@ class CCI(CollectionHandler):
                     'title': drs if drs != '_all' else 'All Files',
                     'path': dataset['result_field']['dataPath'],
                     'is_published': True,
-                    '__id': id
+                    '__id': id,
+                    'links': {
+                        'describedby': [
+                            {
+                                'title': 'Dataset Information',
+                                'href': f'https://catalogue.ceda.ac.uk/uuid/{dataset["uuid"]}'
+                            }
+                        ]
+                    }
                 }
 
                 # Don't want a drs filter on the files when doing _all
                 if drs != '_all':
                     metadata.update(
                         self.get_elasticsearch_aggregation(
+                            source_index,
                             dataset['result_field']['dataPath'],
                             extra_query_clauses=[
                                 {'term': {f'projects.{self.project_name}.drsId.keyword': drs}}
@@ -429,6 +443,7 @@ class CCI(CollectionHandler):
                 else:
                     metadata.update(
                         self.get_elasticsearch_aggregation(
+                            source_index,
                             dataset['result_field']['dataPath']
                         )
                     )
@@ -438,7 +453,7 @@ class CCI(CollectionHandler):
         for collection in collections:
             id = collection.pop('__id')
             yield {
-                '_index': index,
+                '_index': dest_index,
                 '_id': id,
                 '_source': collection
 

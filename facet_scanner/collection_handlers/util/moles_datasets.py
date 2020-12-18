@@ -11,20 +11,25 @@ import os
 import requests
 from json.decoder import JSONDecodeError
 from requests.exceptions import Timeout
-
+import json
 
 class CatalogueDatasets():
     
-    def __init__(self, moles_base='http://api.catalogue.ceda.ac.uk'):
+    def __init__(self, moles_base='http://api.catalogue.ceda.ac.uk', moles_mapping=None):
         self.moles_base = moles_base
         
         self.moles_mapping_url = f'{moles_base}/api/v0/obs/all'
-        
-        try:
-            self.moles_mapping = requests.get(self.moles_mapping_url).json()
-        except JSONDecodeError as e:
-            import sys
-            raise ConnectionError(f'Could not connect to {self.moles_mapping_url} to get moles mapping') from e
+
+        # Try loading mapping from disk
+        if moles_mapping:
+            with open(moles_mapping) as reader:
+                self.moles_mapping = json.load(reader)
+        else:
+            try:
+                self.moles_mapping = requests.get(self.moles_mapping_url).json()
+            except JSONDecodeError as e:
+                import sys
+                raise ConnectionError(f'Could not connect to {self.moles_mapping_url} to get moles mapping') from e
 
     def get_moles_record_metadata(self, path):
         """
