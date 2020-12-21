@@ -22,6 +22,14 @@ class CollectionHandler(metaclass=Singleton):
     """
     Base Class for all collection handlers.
 
+    Parameters:
+    -----------
+
+    :param kwargs: Passed to ElasticsearchConnection class
+
+    Attributes:
+    -----------
+
     :attr extensions:
         File extensions to include. If none provided will default to all
     :type extensions:

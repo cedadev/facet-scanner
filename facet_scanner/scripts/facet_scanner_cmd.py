@@ -1,6 +1,17 @@
 # encoding: utf-8
 """
 
+Facet Scanner CMD MRO
+---------------------
+
+1. facet_scanner.scripts.facet_scanner_cmd.FacetExtractor.process_path
+2. facet_scanner.core.facet_scanner.FacetScanner.get_handler
+3. facet_scanner.collection_handlers.utils.facet_factory.FacetFactory.get_handler
+4. facet_scanner.collection_handlers.base.CollectionHandler.export_facets
+5. facets_scanner.core.elasticsearch_connection.ElasticsearchConnection.get_query
+6. facets_scanner.core.elasticsearch_connection.ElasticsearchConnection.get_hits
+7. facet_scanner.collection_handlers.base.CollectionHandler.lotus_submit
+
 """
 __author__ = 'Richard Smith'
 __date__ = '26 Mar 2019'
@@ -8,7 +19,6 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.collection_handlers.util import FacetFactory
 import argparse
 import os
 from configparser import RawConfigParser

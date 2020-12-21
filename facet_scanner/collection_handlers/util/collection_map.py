@@ -9,6 +9,6 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 COLLECTION_MAP = {
-    '/badc/cmip5/data': dict(exts=['.nc'], handler='facet_scanner.collection_handlers.cmip5.CMIP5'),
-    '/neodc/esacci': dict(exts=['.nc'], handler='facet_scanner.collection_handlers.cci.CCI')
+    '/badc/cmip5/data': dict(handler='facet_scanner.collection_handlers.cmip5.CMIP5'),
+    '/neodc/esacci': dict(handler='facet_scanner.collection_handlers.cci.CCI')
 }
