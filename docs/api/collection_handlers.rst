@@ -1,5 +1,6 @@
 .. _collection-handlers-base:
 
+
 Collection Handlers
 ========================
 
@@ -29,3 +30,20 @@ CMIP5
 .. py:currentmodule:: facet_scanner.collection_handlers.cmip5
 .. autoclass:: CMIP5
     :members:
+
+Utils
+=====
+
+Collection Map
+--------------
+
+.. automodule:: facet_scanner.collection_handlers.util.collection_map
+
+Facet Factory
+-------------
+
+.. automodule:: facet_scanner.collection_handlers.util.facet_factory
+
+Moles Datasets
+---------------
+.. automodule:: facet_scanner.collection_handlers.util.moles_datasets

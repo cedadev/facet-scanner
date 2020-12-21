@@ -11,10 +11,8 @@ and creating a new handler class.
 Collection Map
 --------------
 
-The collection map makes the connection from the filepath to the correct handler class.
-It is a python dict of format::
-
-    "/path/to/collection":dict(handler="facet_scanner.collection_handlers.<module>.<handler_class>")
+.. automodule:: facet_scanner.collection_handlers.util.collection_map
+    :noindex:
 
 The :code:`<module>.<handler_class>` variables are substituted to match the new collection handler.
 

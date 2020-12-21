@@ -1,5 +1,10 @@
 # encoding: utf-8
 """
+A Python dictionary which contains the mapping from path to collection handler.py
+
+The key pairs are formed::
+
+    '/path/to/dataset: dict(handler='facet_scanner.collection_handlers.<handler_module>.<handler_class>')
 
 """
 __author__ = 'Richard Smith'
