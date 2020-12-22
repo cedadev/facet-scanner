@@ -14,11 +14,28 @@ import subprocess
 import json
 import importlib.util
 from tqdm import tqdm
-from facet_scanner.util import generator_grouper, Singleton
+from facet_scanner.utils import generator_grouper, Singleton
 import time
 
 
 class CollectionHandler(metaclass=Singleton):
+    """
+    Base Class for all collection handlers.
+
+    :param kwargs: Passed to ElasticsearchConnection class
+
+    :attr extensions:
+        File extensions to include. If none provided will default to all
+    :type extensions:
+        list
+
+    :attr filters:
+        Additional filters to go as part of the must_not clause of the elasticsearch query
+        when retrieving the initial file list.
+    :type filters:
+        list
+
+    """
 
     @property
     def project_name(self):
@@ -43,6 +60,7 @@ class CollectionHandler(metaclass=Singleton):
     def __init__(self, **kwargs):
         """
         Create the elasticsearch connection
+
         :param kwargs: kwargs to pass into the Elasticsearch connection class
         """
         # clean out extra arguments if they are there
@@ -54,6 +72,7 @@ class CollectionHandler(metaclass=Singleton):
     def get_facets(self, path):
         """
         Each collection handler must specify the method for extracting the facets
+
         :param path: File path
         :return: dict Facet:value pairs
         """
@@ -62,6 +81,7 @@ class CollectionHandler(metaclass=Singleton):
     def export_facets(self, path, index, processing_path, lotus=True, rerun=False, batch_size=500):
         """
         Dumps the list of files to process and calls lotus to add to index
+
         :param path: directory root of the collection
         :param index: index to add the facets to
         :param processing_path: directory to place the elasticsearch pages for processing by lotus
@@ -106,6 +126,7 @@ class CollectionHandler(metaclass=Singleton):
         """
         Take a file containing elasticsearch documents and update the index with
         facets at these locations
+
         :param path: Path to elasticsearch input file
         :param index: Index to update
         """
@@ -115,6 +136,7 @@ class CollectionHandler(metaclass=Singleton):
     def _facet_generator(self, path, index):
         """
         Generator method which reads a file containing a list of elasticsearch documents
+
         :param path: Path to input file
         :param index: index to use as destination for facets
         :return: generator to use with elasticsearch bulk helper
@@ -155,6 +177,7 @@ class CollectionHandler(metaclass=Singleton):
         """
         Optional handle to enable different handling of collections between datasets.
         Returns None and handles indexing of the relevant metadata.
+
         :param index: Name of the collection index
         """
         raise NotImplementedError
@@ -163,6 +186,7 @@ class CollectionHandler(metaclass=Singleton):
         """
         Optional handle to enable different handling of collections between datasets.
         Returns None and handles indexing of the relevant metadata.
+
         :param index: Name of the collection index
         """
         raise NotImplementedError

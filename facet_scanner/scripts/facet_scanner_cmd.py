@@ -1,6 +1,17 @@
 # encoding: utf-8
 """
 
+Facet Scanner CMD MRO
+---------------------
+
+1. facet_scanner.scripts.facet_scanner_cmd.FacetExtractor.process_path
+2. facet_scanner.core.facet_scanner.FacetScanner.get_handler
+3. facet_scanner.collection_handlers.utils.facet_factory.FacetFactory.get_handler
+4. facet_scanner.collection_handlers.base.CollectionHandler.export_facets
+5. facets_scanner.core.elasticsearch_connection.ElasticsearchConnection.get_query
+6. facets_scanner.core.elasticsearch_connection.ElasticsearchConnection.get_hits
+7. facet_scanner.collection_handlers.base.CollectionHandler.lotus_submit
+
 """
 __author__ = 'Richard Smith'
 __date__ = '26 Mar 2019'
@@ -8,11 +19,10 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.collection_handlers.util import FacetFactory
 import argparse
 import os
 from configparser import RawConfigParser
-from facet_scanner.util import query_yes_no
+from facet_scanner.utils import query_yes_no
 from facet_scanner.core.facet_scanner import FacetScanner
 
 
@@ -35,8 +45,10 @@ class FacetExtractor(FacetScanner):
 
     def process_path(self, cmd_args):
         """
+        Main routine for processing a path from the command line arguments
 
         :param cmd_args: Arguments from the command line
+        :type cmd_args: argparse.Namespace
         """
         print('Getting handler...')
         handler = self.get_handler(cmd_args.path, headers={'x-api-key': self.es_password}, facet_json=self.facet_json)
@@ -52,7 +64,13 @@ class FacetExtractor(FacetScanner):
 
     @staticmethod
     def _get_command_line_args():
-        # Get command line arguments
+        """
+        Defines the command line arguments and handles their extraction
+
+        :return: Parsed arguments
+        :rtype: argparse.Namespace
+        """
+
         parser = argparse.ArgumentParser(description='Process path for facets and update the index')
         parser.add_argument('path', type=str, help='Path to process')
         parser.add_argument('processing_path', type=str, help='Path to output intermediate files')
@@ -66,6 +84,12 @@ class FacetExtractor(FacetScanner):
 
     @classmethod
     def main(cls):
+        """
+        Main routine. Extracts the command line options,
+        loads the configuration file and initiaises the scanner before calling
+        cls.process_path
+
+        """
         args = cls._get_command_line_args()
 
         # Load config file

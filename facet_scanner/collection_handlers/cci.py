@@ -10,9 +10,9 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.collection_handlers.base import CollectionHandler
 from cci_tagger.tagger import ProcessDatasets
-from .util import CatalogueDatasets
+from .utils import CatalogueDatasets
 import requests
-from facet_scanner.util import parse_key
+from facet_scanner.utils import parse_key
 from tqdm import tqdm
 import hashlib
 
@@ -20,6 +20,7 @@ import hashlib
 def nested_get(key_list, input_dict, default=None):
     """
     Takes an iterable of keys and returns none if not found or the value
+
     :param key_list:
     :return:
 
@@ -37,7 +38,23 @@ def nested_get(key_list, input_dict, default=None):
 
 class CCI(CollectionHandler):
     """
+    Collection Handler for the CCI project
+
+    Parameters:
+    -----------
+
+    :param collection_root: Used when building the root object for this collection
+    :param facet_json: Used?
+
+    :attr collection_id: The collection id for root collection
+    :attr collection_title: The collection Title for root collection
+    :attr project_name: The project to attach the metadata to a
+    :attr extensions: File extension filters
+    :attr filters: Additional filters
+    :attr facets: Facet mappings for use in get_facets method
+
     """
+
     collection_id = 'cci'
     collection_title = 'CCI'
 
@@ -78,6 +95,7 @@ class CCI(CollectionHandler):
     def get_facets(self, path):
         """
         Extract the facets from the file path
+
         :param path: File path
         :return: Dict  Facet:value pairs
         """
@@ -112,6 +130,7 @@ class CCI(CollectionHandler):
     def _get_temporal(results):
         """
         Get start and end date for collection
+
         :return:
         """
 
@@ -149,6 +168,7 @@ class CCI(CollectionHandler):
     def _get_geospatial(results):
         """
         Get bounding box from Elasticsearch aggregation response
+
         :param results: Elasticsearch response
         :return: Geospatial bbox dictionary
         """
@@ -189,6 +209,7 @@ class CCI(CollectionHandler):
     def _get_collection_facets(self, results):
         """
         Extracts the facet values from the elasticsearch response
+
         :param results: Elasticsearch response json
         :return: Dictionary of facet values
         """
@@ -209,6 +230,7 @@ class CCI(CollectionHandler):
     def _get_collection_variables(results):
         """
         Convert the aggreation into a dictionary of variables for opensearch
+
         :param results:
         :return:
         """
@@ -263,19 +285,24 @@ class CCI(CollectionHandler):
 
         return {'aggregations': aggregations}
 
-    def get_elasticsearch_aggregation(self, path, variables=True, aggregations=True):
+    def _get_elasticsearch_aggregation(self, path, variables=True, aggregations=True):
         """
         Repeated action of getting the aggregations at different levels depending on the specified file path
-        :param path: File path
-        :return: metadata dictionary representative of dataset. If all data found, gives:
 
-        {
-            'start_date': ...,
-            'end_date': ...,
-            'bbox': ...,
-            'facet1': ...,
-            'facet2': ...,
-        }
+
+        If all aggregation data found, gives::
+
+            {
+                'start_date': ...,
+                'end_date': ...,
+                'bbox': ...,
+                'facet1': ...,
+                'facet2': ...,
+            }
+
+        :param path: File path
+        :return: metadata dictionary representative of dataset
+
         """
 
         metadata = {}
@@ -339,6 +366,7 @@ class CCI(CollectionHandler):
     def _generate_collections(self, index):
         """
         Collection level metadata is generated to map to MOLES datasets
+
         :param path: File path
         :return: None
         """
@@ -361,7 +389,7 @@ class CCI(CollectionHandler):
                 '__id': dataset['uuid']
             }
 
-            metadata.update(self.get_elasticsearch_aggregation(dataset['result_field']['dataPath']))
+            metadata.update(self._get_elasticsearch_aggregation(dataset['result_field']['dataPath']))
             collections.append(metadata)
 
         # Generate elasticsearch indexing metadata
