@@ -37,13 +37,15 @@ Utils
 Collection Map
 --------------
 
-.. automodule:: facet_scanner.collection_handlers.util.collection_map
+.. automodule:: facet_scanner.collection_handlers.utils.collection_map
 
 Facet Factory
 -------------
 
-.. automodule:: facet_scanner.collection_handlers.util.facet_factory
+.. automodule:: facet_scanner.collection_handlers.utils.facet_factory
+    :members:
 
 Moles Datasets
 ---------------
-.. automodule:: facet_scanner.collection_handlers.util.moles_datasets
+.. automodule:: facet_scanner.collection_handlers.utils.moles_datasets
+    :members:

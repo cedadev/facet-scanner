@@ -28,8 +28,11 @@ class LotusFacetScanner(FacetExtractor):
 
     def process_path(self, cmd_args):
         """
+        Open the page file, extract the list of file paths and process
+        each one to extract the facets.
 
         :param cmd_args: Arguments from the command line
+        :type cmd_args: argparse.Namespace
         """
 
         # Get first item in processing file to extract path to get handler
@@ -48,13 +51,19 @@ class LotusFacetScanner(FacetExtractor):
 
     @staticmethod
     def _get_command_line_args():
-        # Get command line arguments
-        parser = argparse.ArgumentParser(description='Process path for facets and update the index')
-        parser.add_argument('path', type=str, help='Path to process')
+        """
+        Get the command line arguments and return parsed args
+        :return: Parsed args
+        :rtype: argparse.Namespace
+        """
+        parser = argparse.ArgumentParser(description='Process path for facets and update the index. This script is designed'
+                                                     ' to be run as a batch process on lotus')
+        parser.add_argument('path', type=str, help='Path to page file for processing')
         parser.add_argument('--conf', dest='conf',
                             default=os.path.join(os.path.dirname(__file__), '../conf/facet_scanner.ini'))
 
         return parser.parse_args()
+
 
 if __name__ == '__main__':
     LotusFacetScanner.main()

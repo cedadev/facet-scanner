@@ -1,6 +1,5 @@
 # encoding: utf-8
 """
-
 """
 __author__ = 'Richard Smith'
 __date__ = '26 Mar 2019'
@@ -14,28 +13,22 @@ import os
 
 
 class FacetFactory:
+    """
+    Factory Class to return the correct collection handler based on the
+    given filepath.
+    """
 
     def __init__(self):
         self.map = COLLECTION_MAP
 
-    def get_handler(self, path):
-        """
-        Takes a system path and returns the file extensions to look for and
-        the correct handler for the collection.
-
-        :param path:
-        :return: granule extension, handler class
-        """
-
-        collection_details, collection_path = self.get_collection_map(path)
-        if collection_details is not None:
-            return locate(collection_details['handler']), collection_path
-
     def get_collection_map(self, path):
         """
         Takes an arbitrary path and returns a collection path
+
         :param path: Path to the data of interest
+        :type path: str
         :return: The value from the map object
+        :rtype: str, str
         """
 
         if not path.endswith('/'):
@@ -49,4 +42,19 @@ class FacetFactory:
             return None, None
 
         return self.map[path], path
+
+    def get_handler(self, path):
+        """
+        Takes a system path and returns the correct handler for the collection.
+
+        :param path: Filepath
+        :type path: str
+
+        :return: handler class, collection path
+        :rtype: CollectionHandler, str
+        """
+
+        collection_details, collection_path = self.get_collection_map(path)
+        if collection_details is not None:
+            return locate(collection_details['handler']), collection_path
 

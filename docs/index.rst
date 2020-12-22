@@ -43,10 +43,11 @@ flag sets the page size and determines how many files end up in each lotus batch
    adding_a_handler
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: API:
 
    api/collection_handlers
+   api/scripts
 
 
 Indices and table

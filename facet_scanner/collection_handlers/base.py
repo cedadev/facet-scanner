@@ -14,7 +14,7 @@ import subprocess
 import json
 import importlib.util
 from tqdm import tqdm
-from facet_scanner.util import generator_grouper, Singleton
+from facet_scanner.utils import generator_grouper, Singleton
 import time
 
 
@@ -22,13 +22,7 @@ class CollectionHandler(metaclass=Singleton):
     """
     Base Class for all collection handlers.
 
-    Parameters:
-    -----------
-
     :param kwargs: Passed to ElasticsearchConnection class
-
-    Attributes:
-    -----------
 
     :attr extensions:
         File extensions to include. If none provided will default to all

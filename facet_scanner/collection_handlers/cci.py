@@ -10,9 +10,9 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.collection_handlers.base import CollectionHandler
 from cci_tagger.tagger import ProcessDatasets
-from .util import CatalogueDatasets
+from .utils import CatalogueDatasets
 import requests
-from facet_scanner.util import parse_key
+from facet_scanner.utils import parse_key
 from tqdm import tqdm
 import hashlib
 

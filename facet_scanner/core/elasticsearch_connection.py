@@ -13,6 +13,10 @@ from ceda_elasticsearch_tools.elasticsearch import CEDAElasticsearchClient
 
 
 class ElasticsearchConnection:
+    """
+    Wrapper class to handle the connection with Elasticsearch.
+    Uses the `CEDAElasticsearchClient <https://github.com/cedadev/ceda-elasticsearch-tools>`_
+    """
 
     def __init__(self, **kwargs):
         self.es = CEDAElasticsearchClient(**kwargs)

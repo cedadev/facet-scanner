@@ -13,9 +13,22 @@ from json.decoder import JSONDecodeError
 from requests.exceptions import Timeout
 
 
-class CatalogueDatasets():
+class CatalogueDatasets:
+    """
+    Class to map a filepath to the relate MOLES record
+
+    :param moles_base: Base URL to the MOLES api server (default: http://api.catalogue.ceda.ac.uk).
+    :type moles_base: str
+
+    """
     
     def __init__(self, moles_base='http://api.catalogue.ceda.ac.uk'):
+        """
+
+        :param moles_base: The base URL for the MOLES API server
+        :type moles_base: str
+        """
+
         self.moles_base = moles_base
         
         self.moles_mapping_url = f'{moles_base}/api/v0/obs/all'
@@ -29,8 +42,22 @@ class CatalogueDatasets():
     def get_moles_record_metadata(self, path):
         """
         Try and find metadata for a MOLES record associated with the path.
+
+        Example API response::
+
+            {
+                "title": "ESA Fire Climate Change Initiative Project  (Fire CCI)",
+                "url": "http://catalogue.ceda.ac.uk/uuid/6c3584d985bd484e8beb23ff0df91292",
+                "record_type": "Project",
+                "record_path": "",
+                "publication_state": "published"
+            }
+
         :param path: Directory path
+        :type path: str
+
         :return: Dictionary containing MOLES title, url and record_type
+        :rtype: dict
         """
 
         # Condition path - remove trailing slash
@@ -60,7 +87,7 @@ class CatalogueDatasets():
         try:
             response = requests.get(url, timeout=10)
         except Timeout:
-            return
+            return {}
 
         # Update moles mapping
         if response:
