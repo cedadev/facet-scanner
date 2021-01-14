@@ -1,4 +1,5 @@
 venv
+docsvenv
 *.pyc
 __pycache__
 .idea
@@ -7,3 +8,4 @@ facet_scanner/tests/data
 cci_vocab
 test_scripts/
 *.ini
+docs/_build

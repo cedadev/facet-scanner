@@ -1,6 +1,7 @@
 # encoding: utf-8
 """
-
+Collection handlers handle the extraction of facets from a set of files which share
+a common structure.
 """
 __author__ = 'Richard Smith'
 __date__ = '26 Mar 2019'
