@@ -10,7 +10,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.collection_handlers.base import CollectionHandler
 from cci_tagger.tagger import ProcessDatasets
-from .utils import CatalogueDatasets
+from facet_scanner.collection_handlers.utils import CatalogueDatasets
 import requests
 from facet_scanner.utils import parse_key
 from tqdm import tqdm
@@ -241,11 +241,20 @@ class CCI(CollectionHandler):
         key = ('aggregations', 'variable', 'buckets')
         variable_buckets = nested_get(key, results)
 
+        # Create a list to capture the var_ids we have seen
+        # to allow us to filter out duplicates
+        var_ids = []
+
         if variable_buckets:
             for bucket in variable_buckets:
                 variable_dict = parse_key(bucket['key'])
                 variable_dict['agg_string'] = bucket['key']
-                variables.append(variable_dict)
+
+                # Check for duplicates
+                var_id = variable_dict.get('var_id')
+                if var_id and var_id not in var_ids:
+                    variables.append(variable_dict)
+                    var_ids.append(var_id)
 
             if variables:
                 response['variable'] = variables
