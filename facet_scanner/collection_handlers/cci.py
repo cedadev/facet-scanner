@@ -45,7 +45,10 @@ class CCI(CollectionHandler):
     -----------
 
     :param collection_root: Used when building the root object for this collection
-    :param facet_json: Used?
+    :param moles_mapping: A JSON file use to reduce the load on the api server
+    compared to being requested by each lotus job.
+    :param facet_json: Used by the cci_tagger ProcessDatasets to initialise the lookup
+    rather than requesting from the vocab server for each lotus job.
 
     :attr collection_id: The collection id for root collection
     :attr collection_title: The collection Title for root collection
