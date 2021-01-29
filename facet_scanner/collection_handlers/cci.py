@@ -15,7 +15,7 @@ import requests
 from facet_scanner.utils import parse_key
 from tqdm import tqdm
 import hashlib
-from facet_scanner.collection_handlers.util import generate_id
+from facet_scanner.collection_handlers.utils import generate_id
 
 
 def nested_get(key_list, input_dict, default=None):
@@ -294,14 +294,16 @@ class CCI(CollectionHandler):
 
         return {'aggregations': aggregations}
 
-    def get_elasticsearch_aggregation(self,source_index, path: str, variables=True, aggregations=True, extra_query_clauses=None):
+    def _get_elasticsearch_aggregation(self, path, file_index, variables=True, aggregations=True, extra_query_clauses=None):
         """
         Repeated action of getting the aggregations at different levels depending on the specified file path
-        :param source_index: The name of the index containing the files
+
         :param path: File path
+        :param file_index: The name of the index containing the files
         :param variables: Whether or not to aggregate variables
         :param aggregations: Whether or not to build aggregation list
         :param extra_query_clauses: Any extra query segments to be added to bool query
+
         :return: metadata dictionary representative of dataset. If all data found, gives:
 
         {
@@ -369,7 +371,7 @@ class CCI(CollectionHandler):
         for facet in self.facets:
             query['aggs'][facet] = {'terms': {'field': f'projects.{self.project_name}.{facet}.keyword', 'size': 1000}}
 
-        result = self.es.search(index=source_index, body=query, request_timeout=60)
+        result = self.es.search(index=file_index, body=query, request_timeout=60)
 
         metadata.update(self._get_temporal(result))
         metadata.update(self._get_geospatial(result))
@@ -382,12 +384,12 @@ class CCI(CollectionHandler):
 
         return metadata
 
-    def _generate_collections(self, source_index, dest_index):
+    def _generate_collections(self, collection_index, file_index):
         """
         Collection level metadata is generated to map to MOLES datasets
 
-        :param path: File path
-        :return: None
+        :param collection_index: index to put the collections in
+        :param file_index: Index to use as source for aggregations
         """
 
         collections = []
@@ -420,7 +422,12 @@ class CCI(CollectionHandler):
                 }
             }
 
-            metadata.update(self.get_elasticsearch_aggregation(source_index, dataset['result_field']['dataPath']))
+            metadata.update(
+                self._get_elasticsearch_aggregation(
+                    dataset['result_field']['dataPath'],
+                    file_index
+                )
+            )
             collections.append(metadata)
 
             # Get drs datasets within MOLES datasets
@@ -458,9 +465,9 @@ class CCI(CollectionHandler):
                 # Don't want a drs filter on the files when doing _all
                 if drs != '_all':
                     metadata.update(
-                        self.get_elasticsearch_aggregation(
-                            source_index,
+                        self._get_elasticsearch_aggregation(
                             dataset['result_field']['dataPath'],
+                            file_index,
                             extra_query_clauses=[
                                 {'term': {f'projects.{self.project_name}.drsId.keyword': drs}}
                             ]
@@ -468,9 +475,9 @@ class CCI(CollectionHandler):
                     )
                 else:
                     metadata.update(
-                        self.get_elasticsearch_aggregation(
-                            source_index,
-                            dataset['result_field']['dataPath']
+                        self._get_elasticsearch_aggregation(
+                            dataset['result_field']['dataPath'],
+                            file_index
                         )
                     )
                 collections.append(metadata)
@@ -479,13 +486,13 @@ class CCI(CollectionHandler):
         for collection in collections:
             id = collection.pop('__id')
             yield {
-                '_index': dest_index,
+                '_index': collection_index,
                 '_id': id,
                 '_source': collection
 
             }
 
-    def _generate_root_collections(self, index):
+    def _generate_root_collections(self, collection_index):
         # Create top level collection
         root_collections = []
 
@@ -541,7 +548,7 @@ class CCI(CollectionHandler):
         for facet in self.facets:
             query['aggs'][facet] = {'terms': {'field': f'{facet}.keyword', 'size': 1000}}
 
-        result = self.es.search(index=index, body=query, request_timeout=60)
+        result = self.es.search(index=collection_index, body=query, request_timeout=60)
 
         metadata.update(self._get_temporal(result))
         metadata.update(self._get_geospatial(result))
@@ -555,7 +562,7 @@ class CCI(CollectionHandler):
         for collection in root_collections:
             id = collection.pop('__id')
             yield {
-                '_index': index,
+                '_index': collection_index,
                 '_id': id,
                 '_source': collection
 
