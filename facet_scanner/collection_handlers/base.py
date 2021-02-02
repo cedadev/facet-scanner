@@ -173,31 +173,32 @@ class CollectionHandler(metaclass=Singleton):
         if os.path.exists(path):
             os.remove(path)
 
-    def _generate_collections(self, index):
+    def _generate_collections(self, collection_index, file_index):
         """
         Optional handle to enable different handling of collections between datasets.
         Returns None and handles indexing of the relevant metadata.
 
-        :param index: Name of the collection index
+        :param collection_index: Name of the collection index
+        :param file_index: Name of the file index
         """
         raise NotImplementedError
 
-    def _generate_root_collections(self, index):
+    def _generate_root_collections(self, collection_index):
         """
         Optional handle to enable different handling of collections between datasets.
         Returns None and handles indexing of the relevant metadata.
 
-        :param index: Name of the collection index
+        :param collection_index: Name of the collection index
         """
         raise NotImplementedError
 
-    def export_collections(self, index):
+    def export_collections(self, collection_index, file_index):
 
         # Make sure the collections index exists with the date range mapping
-        self.es.create_collections_index(index)
+        self.es.create_collections_index(collection_index)
 
-        self.es.bulk(self._generate_collections, index, generator=True)
-        self.es.bulk(self._generate_root_collections, index, generator=True)
+        self.es.bulk(self._generate_collections, collection_index, file_index, generator=True)
+        self.es.bulk(self._generate_root_collections, collection_index, generator=True)
 
 
 
