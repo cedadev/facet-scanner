@@ -66,6 +66,7 @@ class CollectionHandler(metaclass=Singleton):
         # clean out extra arguments if they are there
         kwargs.pop('collection_root')
         kwargs.pop('facet_json', None)
+        kwargs.pop('moles_mapping', None)
 
         self.es = ElasticsearchConnection( **kwargs)
 
@@ -116,9 +117,13 @@ class CollectionHandler(metaclass=Singleton):
                 print('Pausing for 20 seconds')
                 time.sleep(20)
 
-            script_path = importlib.util.find_spec('facet_scanner.scripts.lotus_facet_scanner').origin
-            task = f'python {script_path} {filepath}'
-            command = f'bsub -W 00:30 -e errors/{file}.err {task}'
+            script_path = os.path.dirname(
+                importlib.util.find_spec('facet_scanner.scripts.lotus_facet_scanner').origin
+
+            )
+
+            task = f'{script_path}/lotus_worker.sh {script_path} {filepath}'
+            command = f'sbatch -t 06:00:00 -e errors/{file}.err {task}'
 
             subprocess.run(command, shell=True)
 
@@ -168,10 +173,6 @@ class CollectionHandler(metaclass=Singleton):
                     'doc_as_upsert': True
 
                 }
-
-        # Remove file once processed
-        if os.path.exists(path):
-            os.remove(path)
 
     def _generate_collections(self, collection_index, file_index):
         """
