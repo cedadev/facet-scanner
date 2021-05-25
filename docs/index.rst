@@ -40,6 +40,7 @@ flag sets the page size and determines how many files end up in each lotus batch
    :caption: Contents:
 
    usage
+   configuration
    adding_a_handler
 
 .. toctree::
