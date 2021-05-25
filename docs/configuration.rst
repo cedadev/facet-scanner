@@ -7,6 +7,21 @@ main sections in the configuration:
 - elasticsearch
 - facet_scanner
 
+Environment Variables
+----------------------
+
+Some environment variables are used to set useful settings.
+required settings are indicated by a required flag.
+
++----------------------------------+-----------------------------------------------------------------------------------------+
+| Variable                         | Description                                                                             |
++==================================+=========================================================================================+
+| MOLES_MAPPING_FILE               | Path to the moles mapping cache file. Will use the live API to download if not present  |
++----------------------------------+-----------------------------------------------------------------------------------------+
+| JSON_TAGGER_ROOT (required)      | Root path for the json tagger json files                                                |
++----------------------------------+-----------------------------------------------------------------------------------------+
+
+
 Elasticsearch
 --------------
 
@@ -27,8 +42,6 @@ Facet Scanner
 +-----------------------+-------------------------------------------------------------------------+
 | Option                | Description                                                             |
 +=======================+=========================================================================+
-| moles_mapping         | File path to cache of MOLES mapping to reduce load on the api server    |
-+-----------------------+-------------------------------------------------------------------------+
 | facet_json            | File path to cache of the facets to reduce load on the vocab server.    |
 +-----------------------+-------------------------------------------------------------------------+
 

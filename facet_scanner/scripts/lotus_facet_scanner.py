@@ -43,7 +43,7 @@ class LotusFacetScanner(FacetExtractor):
         print(f'Dataset path: {dataset_path}')
 
         print('Getting handler...')
-        handler = self.get_handler(dataset_path, headers={'x-api-key': self.es_password}, facet_json=self.facet_json, moles_mapping = self.moles_mapping)
+        handler = self.get_handler(dataset_path, headers={'x-api-key': self.es_password}, facet_json=self.facet_json)
         print(handler)
 
         print('Retrieving facets...')

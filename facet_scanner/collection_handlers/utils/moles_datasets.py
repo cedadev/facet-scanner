@@ -11,6 +11,9 @@ import os
 import requests
 from json.decoder import JSONDecodeError
 from requests.exceptions import Timeout
+import json
+
+MOLES_MAPPING_FILE = os.environ.get('MOLES_MAPPING_FILE')
 
 
 class CatalogueDatasets:
@@ -32,12 +35,17 @@ class CatalogueDatasets:
         self.moles_base = moles_base
         
         self.moles_mapping_url = f'{moles_base}/api/v0/obs/all'
-        
-        try:
-            self.moles_mapping = requests.get(self.moles_mapping_url).json()
-        except JSONDecodeError as e:
-            import sys
-            raise ConnectionError(f'Could not connect to {self.moles_mapping_url} to get moles mapping') from e
+
+        # Try loading the mapping from disk
+        if MOLES_MAPPING_FILE:
+            with open(MOLES_MAPPING_FILE) as reader:
+                self.moles_mapping = json.load(reader)
+        else:
+            try:
+                self.moles_mapping = requests.get(self.moles_mapping_url).json()
+            except JSONDecodeError as e:
+                import sys
+                raise ConnectionError(f'Could not connect to {self.moles_mapping_url} to get moles mapping') from e
 
     def get_moles_record_metadata(self, path):
         """
