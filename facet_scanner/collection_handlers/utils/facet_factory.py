@@ -10,6 +10,8 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 from pydoc import locate
 from .collection_map import COLLECTION_MAP
 import os
+from typing import Optional, Tuple
+from facet_scanner.collection_handlers.base import CollectionHandler
 
 
 class FacetFactory:
@@ -43,7 +45,7 @@ class FacetFactory:
 
         return self.map[path], path
 
-    def get_handler(self, path):
+    def get_handler(self, path: str) -> Tuple[Optional[CollectionHandler], Optional[str]]:
         """
         Takes a system path and returns the correct handler for the collection.
 
@@ -58,3 +60,4 @@ class FacetFactory:
         if collection_details is not None:
             return locate(collection_details['handler']), collection_path
 
+        return None, None

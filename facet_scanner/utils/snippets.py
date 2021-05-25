@@ -10,7 +10,6 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import sys
 import itertools
-import subprocess
 from collections import OrderedDict
 
 

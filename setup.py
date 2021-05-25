@@ -21,7 +21,6 @@ from facet_scanner import __version__ as _package_version
 # on package page
 with open("README.md") as readme_file:
     _long_description = readme_file.read()
-
 setup(
     name='facet_scanner',
     version=_package_version,
@@ -38,7 +37,13 @@ setup(
             'LICENSE',
         ],
     },
-    install_requires=[],
+    install_requires=[
+        'cci_tagger',
+        'ceda_elasticsearch_tools',
+        'elasticsearch',
+        'requests',
+        'tqdm'
+    ],
 
     # This qualifier can be used to selectively exclude Python versions -
     # in this case early Python 2 and 3 releases
@@ -72,3 +77,4 @@ setup(
         ]
     }
 )
+
