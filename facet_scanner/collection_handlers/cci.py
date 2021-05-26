@@ -15,6 +15,7 @@ import requests
 from facet_scanner.utils import parse_key
 from tqdm import tqdm
 import hashlib
+import json
 
 
 def nested_get(key_list, input_dict, default=None):
@@ -34,6 +35,21 @@ def nested_get(key_list, input_dict, default=None):
             dict_nest = dict_nest.get(key, {})
         else:
             return dict_nest.get(key, default)
+
+
+def extract_variables(phenomena_list):
+
+    variables = []
+    if isinstance(phenomena_list[0], list):
+        phenomena_list = phenomena_list[0]
+
+    for phenom in phenomena_list:
+        phenom.pop('best_name', None)
+        phenom.pop('agg_string', None)
+        phenom.pop('names', None)
+        variables.append(phenom)
+
+    return variables
 
 
 class CCI(CollectionHandler):
@@ -226,39 +242,58 @@ class CCI(CollectionHandler):
 
         return facets
 
-    @staticmethod
-    def _get_collection_variables(results):
+    def _get_collection_variables(self, results, file_index):
         """
         Convert the aggreation into a dictionary of variables for opensearch
 
         :param results:
         :return:
         """
+
         response = {}
-        variables = []
+        dataset_variables = {}
 
-        # Get the aggregation buckets
-        key = ('aggregations', 'variable', 'buckets')
-        variable_buckets = nested_get(key, results)
+        # Get the list of DRSs
+        key = ('aggregations', 'drsId', 'buckets')
+        values = nested_get(key, results)
 
-        # Create a list to capture the var_ids we have seen
-        # to allow us to filter out duplicates
-        var_ids = []
+        if values:
+            ids = [x['key'] for x in values]
+            print(ids)
 
-        if variable_buckets:
-            for bucket in variable_buckets:
-                variable_dict = parse_key(bucket['key'])
-                variable_dict['agg_string'] = bucket['key']
+            # Sample 1 netCDF file from each DRS
+            for id in ids:
+                query = {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "term": {
+                                        "projects.opensearch.drsId.keyword": {
+                                            "value": id
+                                        }
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "info.format.keyword": {
+                                            "value": "NetCDF"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+                res = self.es.search(index=file_index, body=query, size=1)['hits']['hits']
+                if res:
+                    keys = ('_source', 'info', 'phenomena')
+                    drs_sample = nested_get(keys, res[0])
+                    if drs_sample:
+                        variables = extract_variables(drs_sample)
+                        dataset_variables[id] = variables
 
-                # Check for duplicates
-                var_id = variable_dict.get('var_id')
-                if var_id and var_id not in var_ids:
-                    variables.append(variable_dict)
-                    var_ids.append(var_id)
-
-            if variables:
-                response['variable'] = variables
-
+        response['manifest'] = json.dumps(dataset_variables)
         return response
 
     def _get_dataset_aggregations(self, results):
@@ -294,13 +329,12 @@ class CCI(CollectionHandler):
 
         return {'aggregations': aggregations}
 
-    def _get_elasticsearch_aggregation(self, path, file_index, variables=True, aggregations=True, extra_query_clauses=None):
+    def _get_elasticsearch_aggregation(self, path, file_index, aggregations=True, extra_query_clauses=None):
         """
         Repeated action of getting the aggregations at different levels depending on the specified file path
 
         :param path: File path
         :param file_index: The name of the index containing the files
-        :param variables: Whether or not to aggregate variables
         :param aggregations: Whether or not to build aggregation list
         :param extra_query_clauses: Any extra query segments to be added to bool query
 
@@ -354,14 +388,6 @@ class CCI(CollectionHandler):
             }
         }
 
-        if variables:
-            query['aggs']['variable'] = {
-                'terms': {
-                    'field': 'info.phenomena.agg_string',
-                    'size': 1000
-                }
-            }
-
         # Add any extra query clauses
         if extra_query_clauses:
             for clause in extra_query_clauses:
@@ -377,7 +403,7 @@ class CCI(CollectionHandler):
         metadata.update(self._get_geospatial(result))
         metadata.update(self._get_collection_facets(result))
         metadata.update(self._get_file_formats(result))
-        metadata.update(self._get_collection_variables(result))
+        metadata.update(self._get_collection_variables(result, file_index))
 
         if aggregations:
             metadata.update(self._get_dataset_aggregations(result))
@@ -492,7 +518,7 @@ class CCI(CollectionHandler):
         metadata.update(self._get_temporal(result))
         metadata.update(self._get_geospatial(result))
         metadata.update(self._get_collection_facets(result))
-        metadata.update(self._get_collection_variables(result))
+        # metadata.update(self._get_collection_variables(result))
 
         root_collection.update(metadata)
 
