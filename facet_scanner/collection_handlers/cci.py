@@ -280,6 +280,11 @@ class CCI(CollectionHandler):
                                             "value": "NetCDF"
                                         }
                                     }
+                                },
+                                {
+                                    "exists": {
+                                        "field": "info.phenomena"
+                                    }
                                 }
                             ]
                         }
