@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "facet-scanner"
+version = "0.1.0"
+description = "Extracts facets from datasets to add to elasticsearch."
+authors = ["Daniel Westwood <daniel.westwood@stfc.ac.uk>"]
+license = "{file='LICENSE'}"
+readme = "README.md"
+
+classifiers = [
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: BSD License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+]
+
+include = [
+    { path = "conf/facet_scanner.ini" },
+    { path = "scripts/lotus_worker.sh" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+elasticsearch = "^7"
+requests = "^2.32.3"
+tqdm = "^4.66.6"
+sphinx = "^8.1.3"
+directory-tree = { git = "git@github.com:cedadev/ceda-directory-tree.git", tag = "v1.1.2" }
+ceda-elasticsearch-tools = { git = "git@github.com:cedadev/ceda-elasticsearch-tools.git", tag = "v2.4.0" }
+tag-scanner = { git = "git@github.com:cedadev/cci-tag-scanner.git", tag = "v2.1.2" }
+pytest = "^8.3.3"
+
+
+[tool.poetry.scripts]
+facet_scanner = "facet_scanner.scripts.facet_scanner_cmd:FacetExtractor.main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
