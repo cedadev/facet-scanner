@@ -2,21 +2,20 @@
 """
 Handler to generate facets for the CCI project
 """
-__author__ = 'Richard Smith'
-__date__ = '30 Apr 2019'
-__copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
+__author__ = 'Daniel Westwood'
+__date__ = '29 October 2024'
+__copyright__ = 'Copyright 2024 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
-__contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.collection_handlers.base import CollectionHandler
-from cci_tagger.tagger import ProcessDatasets
-from facet_scanner.collection_handlers.utils import CatalogueDatasets
 import requests
-from facet_scanner.utils import parse_key
 from tqdm import tqdm
 import hashlib
 import json
 
+from facet_scanner.collection_handlers.base import CollectionHandler
+from facet_scanner.collection_handlers.utils import CatalogueDatasets
+from facet_scanner.utils import parse_key
+from tag_scanner.tagger import ProcessDatasets
 
 def nested_get(key_list, input_dict, default=None):
     """
@@ -36,7 +35,6 @@ def nested_get(key_list, input_dict, default=None):
         else:
             return dict_nest.get(key, default)
 
-
 def extract_variables(phenomena_list):
 
     variables = []
@@ -50,7 +48,6 @@ def extract_variables(phenomena_list):
         variables.append(phenom)
 
     return variables
-
 
 class CCI(CollectionHandler):
     """
