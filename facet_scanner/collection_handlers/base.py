@@ -17,6 +17,13 @@ from tqdm import tqdm
 from facet_scanner.utils import generator_grouper, Singleton
 import time
 
+from facet_scanner import logstream
+import logging
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logstream)
+logger.propagate = False
+
 
 class CollectionHandler(metaclass=Singleton):
     """

@@ -23,6 +23,13 @@ import argparse
 import os
 import json
 
+import logging
+from facet_scanner import logstream
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logstream)
+logger.propagate = False
+
 
 class LotusFacetScanner(FacetExtractor):
 

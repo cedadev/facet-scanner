@@ -11,11 +11,18 @@ import requests
 from tqdm import tqdm
 import hashlib
 import json
+import logging
 
 from facet_scanner.collection_handlers.base import CollectionHandler
 from facet_scanner.collection_handlers.utils import CatalogueDatasets
 from facet_scanner.utils import parse_key
 from tag_scanner.tagger import ProcessDatasets
+
+from facet_scanner import logstream
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logstream)
+logger.propagate = False
 
 def nested_get(key_list, input_dict, default=None):
     """
@@ -113,8 +120,11 @@ class CCI(CollectionHandler):
         :return: Dict  Facet:value pairs
         """
 
+        logger.debug('Getting facets for CCI-type path')
+
         tagged_dataset = self.pds.get_file_tags(path)
 
+        logger.debug('Translating tagging code to facet map')
         # Translate between output from tagging code to map to named facets
         mapped_facets = {}
         for tag_name, tag_value in tagged_dataset.labels.items():
@@ -128,6 +138,7 @@ class CCI(CollectionHandler):
                 if tag_name == facet and tag_name_mapping is None:
                     mapped_facets[facet] = tag_value
 
+        logger.debug('Obtaining moles record metadata')
         # Get MOLES catalogue
         moles_info = self.catalogue.get_moles_record_metadata(path)
 
@@ -137,6 +148,7 @@ class CCI(CollectionHandler):
         if moles_info:
             mapped_facets['datasetId'] = moles_info['url'].split('uuid/')[-1]
 
+        logger.debug('Completed facet mapping')
         return mapped_facets
 
     @staticmethod
@@ -256,7 +268,6 @@ class CCI(CollectionHandler):
 
         if values:
             ids = [x['key'] for x in values]
-            print(ids)
 
             # Sample 1 netCDF file from each DRS
             for id in ids:

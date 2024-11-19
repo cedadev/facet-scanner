@@ -24,6 +24,13 @@ import os
 from configparser import RawConfigParser
 from facet_scanner.utils import query_yes_no
 from facet_scanner.core.facet_scanner import FacetScanner
+import logging
+
+from facet_scanner import logstream
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logstream)
+logger.propagate = False
 
 
 class FacetExtractor(FacetScanner):
