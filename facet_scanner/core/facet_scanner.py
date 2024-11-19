@@ -11,7 +11,11 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 from facet_scanner.collection_handlers.utils import FacetFactory
 import logging
 
+from facet_scanner import logstream
+
 logger = logging.getLogger(__name__)
+logger.addHandler(logstream)
+logger.propagate = False
 
 
 class FacetScanner:
@@ -33,8 +37,10 @@ class FacetScanner:
         :return: Mapped collection handler
         :rtype: CollectionHandler
         """
+        logger.debug("Obtaining handler")
         handler, collection_root = self.handler_factory.get_handler(path)
 
+        logger.debug('Handler Obtainment complete')
         # Handle situation where handler not found
         if handler is None:
             logger.error(f'Unable to find a handler for: {path} in facet_scanner.collection_handlers.utils.collection_map.'

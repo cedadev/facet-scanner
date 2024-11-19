@@ -10,6 +10,13 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.collection_handlers.base import CollectionHandler
 import os
+import logging
+
+from facet_scanner import logstream
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logstream)
+logger.propagate = False
 
 class CMIP5(CollectionHandler):
     project_name = 'opensearch'

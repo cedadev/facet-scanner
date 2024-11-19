@@ -11,6 +11,13 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 import sys
 import itertools
 from collections import OrderedDict
+import logging
+
+from facet_scanner import logstream
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logstream)
+logger.propagate = False
 
 
 def query_yes_no(question, default="yes"):
