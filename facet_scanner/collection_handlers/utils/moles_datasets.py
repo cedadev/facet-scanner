@@ -12,6 +12,13 @@ import requests
 from json.decoder import JSONDecodeError
 from requests.exceptions import Timeout
 import json
+import logging
+
+from facet_scanner import logstream
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logstream)
+logger.propagate = False
 
 MOLES_MAPPING_FILE = os.environ.get('MOLES_MAPPING_FILE')
 
