@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "facet-scanner"
-version = "0.1.3"
+version = "0.1.4"
 description = "Extracts facets from datasets to add to elasticsearch."
 authors = ["Daniel Westwood <daniel.westwood@stfc.ac.uk>"]
 license = "{file='LICENSE'}"
@@ -20,7 +20,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.8,<4.0"
 elasticsearch = "^7"
 requests = "^2.32.3"
 tqdm = "^4.66.6"

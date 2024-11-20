@@ -12,7 +12,13 @@ from .collection_map import COLLECTION_MAP
 import os
 from typing import Optional, Tuple
 from facet_scanner.collection_handlers.base import CollectionHandler
+import logging
 
+from facet_scanner import logstream
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logstream)
+logger.propagate = False
 
 class FacetFactory:
     """
@@ -56,6 +62,7 @@ class FacetFactory:
         :rtype: CollectionHandler, str
         """
 
+        logger.debug('Locating collection details')
         collection_details, collection_path = self.get_collection_map(path)
         if collection_details is not None:
             return locate(collection_details['handler']), collection_path
