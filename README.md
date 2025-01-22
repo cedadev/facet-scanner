@@ -5,6 +5,31 @@ The scanner works to map a file path to the specific handler for that collection
 
 [ReadTheDocs Documentation](https://facet-scanner.readthedocs.io/en/latest/index.html)
 
+## Installation
+
+Create a Python virtual environment:
+**Must be Python 3**
+
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+This package can be installed with the following:
+```bash
+git clone https://github.com/facet-scanner
+cd facet-scanner
+pip install -e .
+```
+
+NOTE: As of 22nd Jan 2025 the `facet-scanner` repository has been upgraded for use with Poetry version 2. This requires the use of an additional `requirements_fix.txt` patch while a solution for poetry dependencies in github is worked on. The above installation MUST be supplemented with:
+
+```bash
+pip install -r requirements_fix.txt
+```
+This is a temporary fix and will be removed when poetry is patched.
+
+
 
 ## Running the code
 
