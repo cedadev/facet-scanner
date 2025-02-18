@@ -1,6 +1,8 @@
 # CEDA Facet Scanner
 
 ![Static Badge](https://img.shields.io/badge/cci%20tagger%20workflow-8AD6F6)
+![GitHub Release](https://img.shields.io/github/v/release/cedadev/facet-scanner)
+
 
 Takes datasets and extracts the facets from the files/filepath.
 The scanner works to map a file path to the specific handler for that collection of files. For example, ESA CCI datasets are scanned by the cci handler. This is because each collection of datasets will have different characteristics and will need to be treated in a different way.
