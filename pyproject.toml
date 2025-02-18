@@ -1,6 +1,6 @@
 [project]
 name = "facet-scanner"
-version = "0.2.1"
+version = "0.2.2"
 description = "Extracts facets from datasets to add to elasticsearch."
 authors = [
     { name = "Daniel Westwood", email = "daniel.westwood@stfc.ac.uk"}
