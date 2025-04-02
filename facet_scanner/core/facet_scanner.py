@@ -10,6 +10,7 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from facet_scanner.collection_handlers.utils import FacetFactory
 import logging
+from typing import Union
 
 from facet_scanner import logstream
 
@@ -23,7 +24,9 @@ class FacetScanner:
     Base class for the facet scanner
     """
 
-    def __init__(self):
+    def __init__(self, ontology_local: Union[str,None] = None):
+
+        self._ontology_local = ontology_local
         self.handler_factory = FacetFactory()
 
     def get_handler(self, path, **kwargs):
@@ -46,7 +49,10 @@ class FacetScanner:
             logger.error(f'Unable to find a handler for: {path} in facet_scanner.collection_handlers.utils.collection_map.'
                          ' Update mapping file')
 
-        return handler(collection_root=collection_root, **kwargs)
+        return handler(
+            collection_root=collection_root, 
+            ontology_local=self._ontology_local,
+            **kwargs)
 
     def get_collection(self, path):
         """

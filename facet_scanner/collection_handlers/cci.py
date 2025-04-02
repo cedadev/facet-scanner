@@ -18,6 +18,7 @@ from facet_scanner.collection_handlers.utils import CatalogueDatasets
 from facet_scanner.utils import parse_key
 from tag_scanner.tagger import ProcessDatasets
 
+from typing import Union
 from facet_scanner import logstream
 
 logger = logging.getLogger(__name__)
@@ -95,13 +96,14 @@ class CCI(CollectionHandler):
         'platform': None,
         'platformGroup': 'platform_group',
         'frequency': 'time_coverage_resolution',
+        'project':None,
         'drsId': None
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, ontology_local: Union[str,None] = None, **kwargs):
         super().__init__(**kwargs)
 
-        self.pds = ProcessDatasets(suppress_file_output=True, **kwargs)
+        self.pds = ProcessDatasets(suppress_file_output=True, endpoint=ontology_local,**kwargs)
 
         self.catalogue = CatalogueDatasets()
 
