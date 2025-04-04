@@ -11,10 +11,10 @@ from pydoc import locate
 from .collection_map import COLLECTION_MAP
 import os
 from typing import Optional, Tuple
-from facet_scanner.collection_handlers.base import CollectionHandler
+from cci_facet_scanner.collection_handlers.base import CollectionHandler
 import logging
 
-from facet_scanner import logstream
+from cci_facet_scanner import logstream
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)

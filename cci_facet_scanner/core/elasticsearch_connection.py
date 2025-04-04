@@ -12,7 +12,7 @@ from elasticsearch.helpers import scan, bulk
 from ceda_elasticsearch_tools.elasticsearch import CEDAElasticsearchClient
 
 import logging
-from facet_scanner import logstream
+from cci_facet_scanner import logstream
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)

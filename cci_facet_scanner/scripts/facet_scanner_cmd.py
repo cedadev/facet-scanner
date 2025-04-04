@@ -4,13 +4,13 @@
 Facet Scanner CMD MRO
 ---------------------
 
-1. facet_scanner.scripts.facet_scanner_cmd.FacetExtractor.process_path
-2. facet_scanner.core.facet_scanner.FacetScanner.get_handler
-3. facet_scanner.collection_handlers.utils.facet_factory.FacetFactory.get_handler
-4. facet_scanner.collection_handlers.base.CollectionHandler.export_facets
+1. cci_facet_scanner.scripts.cci_facet_scanner_cmd.FacetExtractor.process_path
+2. cci_facet_scanner.core.cci_facet_scanner.FacetScanner.get_handler
+3. cci_facet_scanner.collection_handlers.utils.facet_factory.FacetFactory.get_handler
+4. cci_facet_scanner.collection_handlers.base.CollectionHandler.export_facets
 5. facets_scanner.core.elasticsearch_connection.ElasticsearchConnection.get_query
 6. facets_scanner.core.elasticsearch_connection.ElasticsearchConnection.get_hits
-7. facet_scanner.collection_handlers.base.CollectionHandler.lotus_submit
+7. cci_facet_scanner.collection_handlers.base.CollectionHandler.lotus_submit
 
 """
 __author__ = 'Richard Smith'
@@ -22,11 +22,11 @@ __contact__ = 'richard.d.smith@stfc.ac.uk'
 import argparse
 import os
 from configparser import RawConfigParser
-from facet_scanner.utils import query_yes_no
-from facet_scanner.core.facet_scanner import FacetScanner
+from cci_facet_scanner.utils import query_yes_no
+from cci_facet_scanner.core.cci_facet_scanner import FacetScanner
 import logging
 
-from facet_scanner import logstream
+from cci_facet_scanner import logstream
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
@@ -41,7 +41,7 @@ class FacetExtractor(FacetScanner):
 
         self.es_password = conf.get('elasticsearch', 'api_key')
         self.index = conf.get('elasticsearch', 'target_index')
-        self.facet_json = conf.get('facet_scanner', 'facet_json', fallback=None)
+        self.facet_json = conf.get('cci_facet_scanner', 'facet_json', fallback=None)
 
         print(
             f'Index: {self.index} '
@@ -85,7 +85,7 @@ class FacetExtractor(FacetScanner):
         parser.add_argument('--num-files', dest='num_files', type=int, help='Number of files per lotus job',
                             default=500)
         parser.add_argument('--conf', dest='conf',
-                            default=os.path.join(os.path.dirname(__file__), '../conf/facet_scanner.ini'))
+                            default=os.path.join(os.path.dirname(__file__), '../conf/cci_facet_scanner.ini'))
 
         return parser.parse_args()
 

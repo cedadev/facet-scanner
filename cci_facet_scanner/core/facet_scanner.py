@@ -8,11 +8,11 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.collection_handlers.utils import FacetFactory
+from cci_facet_scanner.collection_handlers.utils import FacetFactory
 import logging
 from typing import Union
 
-from facet_scanner import logstream
+from cci_facet_scanner import logstream
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
@@ -46,7 +46,7 @@ class FacetScanner:
         logger.debug('Handler Obtainment complete')
         # Handle situation where handler not found
         if handler is None:
-            logger.error(f'Unable to find a handler for: {path} in facet_scanner.collection_handlers.utils.collection_map.'
+            logger.error(f'Unable to find a handler for: {path} in cci_facet_scanner.collection_handlers.utils.collection_map.'
                          ' Update mapping file')
 
         return handler(

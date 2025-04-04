@@ -8,16 +8,16 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.core.elasticsearch_connection import ElasticsearchConnection
+from cci_facet_scanner.core.elasticsearch_connection import ElasticsearchConnection
 import os
 import subprocess
 import json
 import importlib.util
 from tqdm import tqdm
-from facet_scanner.utils import generator_grouper, Singleton
+from cci_facet_scanner.utils import generator_grouper, Singleton
 import time
 
-from facet_scanner import logstream
+from cci_facet_scanner import logstream
 import logging
 
 logger = logging.getLogger(__name__)
@@ -125,7 +125,7 @@ class CollectionHandler(metaclass=Singleton):
                 time.sleep(20)
 
             script_path = os.path.dirname(
-                importlib.util.find_spec('facet_scanner.scripts.lotus_facet_scanner').origin
+                importlib.util.find_spec('cci_facet_scanner.scripts.lotus_cci_facet_scanner').origin
 
             )
 

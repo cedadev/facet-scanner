@@ -13,13 +13,13 @@ import hashlib
 import json
 import logging
 
-from facet_scanner.collection_handlers.base import CollectionHandler
-from facet_scanner.collection_handlers.utils import CatalogueDatasets
-from facet_scanner.utils import parse_key
+from cci_facet_scanner.collection_handlers.base import CollectionHandler
+from cci_facet_scanner.collection_handlers.utils import CatalogueDatasets
+from cci_facet_scanner.utils import parse_key
 from tag_scanner.tagger import ProcessDatasets
 
 from typing import Union
-from facet_scanner import logstream
+from cci_facet_scanner import logstream
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)

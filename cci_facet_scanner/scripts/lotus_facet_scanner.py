@@ -4,12 +4,12 @@
 Lotus Facet Scanner MRO
 ------------------------
 
-1. facet_scanner.scripts.lotus_facet_scanner.LotusFacetScanner.process_path
-2. facet_scanner.core.facet_scanner.FacetScanner.get_handler
-3. facet_scanner.collection_handlers.utils.facet_factory.FacetFactory.get_handler
-4. facet_scanner.collection_handlers.base.CollectionHandler.update_facets
-5. facet_scanner.collection_handlers.base.CollectionHandler._facet_generator
-6. facet_scanner.collection_handlers.base.CollectionHandler.get_facets
+1. cci_facet_scanner.scripts.lotus_facet_scanner.LotusFacetScanner.process_path
+2. cci_facet_scanner.core.facet_scanner.FacetScanner.get_handler
+3. cci_facet_scanner.collection_handlers.utils.facet_factory.FacetFactory.get_handler
+4. cci_facet_scanner.collection_handlers.base.CollectionHandler.update_facets
+5. cci_facet_scanner.collection_handlers.base.CollectionHandler._facet_generator
+6. cci_facet_scanner.collection_handlers.base.CollectionHandler.get_facets
 
 """
 __author__ = 'Richard Smith'
@@ -18,13 +18,13 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.scripts.facet_scanner_cmd import FacetExtractor
+from cci_facet_scanner.scripts.facet_scanner_cmd import FacetExtractor
 import argparse
 import os
 import json
 
 import logging
-from facet_scanner import logstream
+from cci_facet_scanner import logstream
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
@@ -73,7 +73,7 @@ class LotusFacetScanner(FacetExtractor):
                                                      ' to be run as a batch process on lotus')
         parser.add_argument('path', type=str, help='Path to page file for processing')
         parser.add_argument('--conf', dest='conf',
-                            default=os.path.join(os.path.dirname(__file__), '../conf/facet_scanner.ini'))
+                            default=os.path.join(os.path.dirname(__file__), '../conf/cci_facet_scanner.ini'))
 
         return parser.parse_args()
 

@@ -8,11 +8,11 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from facet_scanner.collection_handlers.base import CollectionHandler
+from cci_facet_scanner.collection_handlers.base import CollectionHandler
 import os
 import logging
 
-from facet_scanner import logstream
+from cci_facet_scanner import logstream
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
