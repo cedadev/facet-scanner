@@ -23,7 +23,7 @@ import argparse
 import os
 from configparser import RawConfigParser
 from cci_facet_scanner.utils import query_yes_no
-from cci_facet_scanner.core.cci_facet_scanner import FacetScanner
+from cci_facet_scanner.core.facet_scanner import FacetScanner
 import logging
 
 from cci_facet_scanner import logstream
