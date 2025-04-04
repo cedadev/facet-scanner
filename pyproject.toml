@@ -1,6 +1,6 @@
 [project]
-name = "facet-scanner"
-version = "0.2.3"
+name = "cci-facet-scanner"
+version = "0.3.0"
 description = "Extracts facets from datasets to add to elasticsearch."
 authors = [
     { name = "Daniel Westwood", email = "daniel.westwood@stfc.ac.uk"}
@@ -24,13 +24,9 @@ dependencies = [
     "requests (>=2.32.3,<3.0.0)", 
     "tqdm (>=4.66.6,<5.0.0)", 
     "sphinx (>=7,<8)", 
-    "pytest (>=8.3.3,<9.0.0)"
+    "pytest (>=8.3.3,<9.0.0)",
+    "cci-tag-scanner (>=2.3.0)"
 ]
-
-#ceda-elasticsearch-tools = { git = "https://github.com/cedadev/ceda-elasticsearch-tools.git", tag = "v2.4.0" }
-#tag-scanner = { git = "https://github.com/cedadev/cci-tag-scanner.git", tag = "v2.1.9" }
-
-
 
 [project.scripts]
 facet_scanner = "facet_scanner.scripts.facet_scanner_cmd:FacetExtractor.main"

@@ -1,32 +1,28 @@
 name: Automatic Test
-# Specify which GitHub events will trigger a CI build
 
-on: push
-# Define a single job, build
+on:
+  - push
+  - pull_request
 
 jobs:
   build:
-    # Specify an OS for the runner
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9','3.10','3.11','3.12']
 
-    #Define steps
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      # Firstly, checkout repo
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      # Set up Python env
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
-      # Install dependencies
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip3 install .
-          pip3 install -r requirements_fix.txt
-      # Test with pytest
-      - name: Run pytest
-        run: |
-          pytest
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip3 install poetry
+        poetry install
+    - name: Run tests
+      run: poetry run pytest
