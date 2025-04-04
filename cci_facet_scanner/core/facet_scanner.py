@@ -29,7 +29,7 @@ class FacetScanner:
         self._ontology_local = ontology_local
         self.handler_factory = FacetFactory()
 
-    def get_handler(self, path, **kwargs):
+    def get_handler(self, path, api_key: Union[str,None] = None,**kwargs):
         """
         Get the correct handler for the given path
 
@@ -52,6 +52,7 @@ class FacetScanner:
         return handler(
             collection_root=collection_root, 
             ontology_local=self._ontology_local,
+            api_key=api_key,
             **kwargs)
 
     def get_collection(self, path):

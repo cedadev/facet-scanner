@@ -9,7 +9,8 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 from elasticsearch.helpers import scan, bulk
-from ceda_elasticsearch_tools.elasticsearch import CEDAElasticsearchClient
+from elasticsearch import Elasticsearch
+from typing import Union
 
 import logging
 from cci_facet_scanner import logstream
@@ -24,8 +25,18 @@ class ElasticsearchConnection:
     Uses the `CEDAElasticsearchClient <https://github.com/cedadev/ceda-elasticsearch-tools>`_
     """
 
-    def __init__(self, **kwargs):
-        self.es = CEDAElasticsearchClient(**kwargs)
+    def __init__(self, api_key: Union[str,None] = None, **kwargs):
+
+        if api_key is None:
+            logger.warning(
+                'No API key given, ES client will not have write permission.'
+            )
+        api_key = api_key or ''
+
+        self.es = Elasticsearch(
+            hosts=["https://elasticsearch.ceda.ac.uk"],
+            headers={'x-api-key':api_key},
+            **kwargs)
 
     def get_hits(self, index, query=None):
         return scan(self.es, query=query, index=index)

@@ -17,6 +17,8 @@ from tqdm import tqdm
 from cci_facet_scanner.utils import generator_grouper, Singleton
 import time
 
+from typing import Union
+
 from cci_facet_scanner import logstream
 import logging
 
@@ -64,7 +66,7 @@ class CollectionHandler(metaclass=Singleton):
     #   }
     filters = []
 
-    def __init__(self, **kwargs):
+    def __init__(self, api_key: Union[str,None] = None,**kwargs):
         """
         Create the elasticsearch connection
 
@@ -75,7 +77,7 @@ class CollectionHandler(metaclass=Singleton):
         kwargs.pop('facet_json', None)
         kwargs.pop('moles_mapping', None)
 
-        self.es = ElasticsearchConnection( **kwargs)
+        self.es = ElasticsearchConnection(api_key=api_key, **kwargs)
 
     def get_facets(self, path):
         """

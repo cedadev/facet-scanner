@@ -58,8 +58,7 @@ class FacetExtractor(FacetScanner):
         :type cmd_args: argparse.Namespace
         """
         print('Getting handler...')
-        handler = self.get_handler(cmd_args.path, headers={'x-api-key': self.es_password}, facet_json=self.facet_json)
-        print(handler)
+        handler = self.get_handler(cmd_args.path, api_key=self.es_password, facet_json=self.facet_json)
 
         print('Retrieving facets...')
         handler.export_facets(cmd_args.path, self.index, cmd_args.processing_path, rerun=cmd_args.rerun, batch_size=cmd_args.num_files)

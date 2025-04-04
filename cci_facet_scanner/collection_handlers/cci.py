@@ -16,7 +16,7 @@ import logging
 from cci_facet_scanner.collection_handlers.base import CollectionHandler
 from cci_facet_scanner.collection_handlers.utils import CatalogueDatasets
 from cci_facet_scanner.utils import parse_key
-from tag_scanner.tagger import ProcessDatasets
+from cci_tag_scanner.tagger import ProcessDatasets
 
 from typing import Union
 from cci_facet_scanner import logstream
