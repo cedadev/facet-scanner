@@ -8,3 +8,5 @@ facet_scanner/tests/data
 cci_vocab
 test_scripts/
 docs/_build
+dist/
+.venv/
