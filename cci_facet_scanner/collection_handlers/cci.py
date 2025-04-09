@@ -439,11 +439,16 @@ class CCI(CollectionHandler):
 
         # Create moles level collections
         # Get the moles datasets for the given path
-        r = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?discoveryKeyword=ESACCI&limit=300')
+        r = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?discoveryKeyword=ESACCI&limit=400')
 
         moles_datasets = r.json()['results']
 
         for dataset in tqdm(moles_datasets, desc='Looping MOLES datasets'):
+
+            if dataset.get('publicationState',None) not in ['published', 'citable']:
+                # Skip non-published/citable records
+                continue
+
             metadata = {
                 'collection_id': dataset['uuid'],
                 'parent_identifier': self.collection_id,
