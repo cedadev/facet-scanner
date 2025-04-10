@@ -2,6 +2,7 @@
 
 ![Static Badge](https://img.shields.io/badge/cci%20tagger%20workflow-8AD6F6)
 ![GitHub Release](https://img.shields.io/github/v/release/cedadev/facet-scanner)
+[![PyPI version](https://badge.fury.io/py/cci-facet-scanner.svg)](https://pypi.python.org/pypi/cci-facet-scanner/)
 
 
 Takes datasets and extracts the facets from the files/filepath.
