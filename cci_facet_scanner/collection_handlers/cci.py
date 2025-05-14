@@ -458,10 +458,6 @@ class CCI(CollectionHandler):
 
         for dataset in tqdm(moles_datasets, desc='Looping MOLES datasets'):
 
-            if dataset.get('publicationState',None) not in ['published', 'citable']:
-                # Skip non-published/citable records
-                continue
-
             metadata = {
                 'collection_id': dataset['uuid'],
                 'parent_identifier': self.collection_id,
