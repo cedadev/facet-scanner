@@ -436,18 +436,27 @@ class CCI(CollectionHandler):
         """
 
         collections = []
+        url = 'https://catalogue.ceda.ac.uk/api/v2/observations.json?fields=uuid,title,result_field&page=1&per_page=100&discoveryKeywords__name=ESACCI&publicationState__in=citable,published'
 
-        # Create moles level collections
-        # Get the moles datasets for the given path
-        r = requests.get(f'http://api.catalogue.ceda.ac.uk/api/v1/observations.json?discoveryKeyword=ESACCI&limit=400')
+        # Find all datasets across all pages
+        moles_datasets = []
+        found_all = False
+        page = 0
+        while not found_all:
+            page += 1
+            logger.debug(f'Retrieving page: {page}')
+            r = requests.get(url)
 
-        moles_datasets = r.json()['results']
+            # Capture datasets
+            moles_datasets += r.json()['results']
+
+            # Check next page exists.
+            if r.json()['next']:
+                url = r.json()['next']
+            else:
+                found_all = True
 
         for dataset in tqdm(moles_datasets, desc='Looping MOLES datasets'):
-
-            if dataset.get('publicationState',None) not in ['published', 'citable']:
-                # Skip non-published/citable records
-                continue
 
             metadata = {
                 'collection_id': dataset['uuid'],
