@@ -1,6 +1,6 @@
 [project]
 name = "cci-facet-scanner"
-version = "0.3.2"
+version = "0.4.0"
 description = "Extracts facets from datasets to add to elasticsearch."
 authors = [
     { name = "Daniel Westwood", email = "daniel.westwood@stfc.ac.uk"}
@@ -20,12 +20,12 @@ include = [
 ]
 requires-python = ">=3.9,<4.0"
 dependencies = [
-    "elasticsearch (>=7,<8)", 
+    "elasticsearch (>=8, <9)", 
     "requests (>=2.32.3,<3.0.0)", 
     "tqdm (>=4.66.6,<5.0.0)", 
     "sphinx (>=7,<8)", 
     "pytest (>=8.3.3,<9.0.0)",
-    "cci-tag-scanner (>=2.3.1)"
+    "cci-tag-scanner (>=2.4.0)"
 ]
 
 [project.scripts]

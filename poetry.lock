@@ -56,19 +56,19 @@ files = [
 
 [[package]]
 name = "cci-tag-scanner"
-version = "2.3.1"
+version = "2.4.0"
 description = "This package provides a command line tool moles_esgf_tag to generate dataset tags for both MOLES and ESGF."
 optional = false
 python-versions = "<4,>=3.9"
 groups = ["main"]
 files = [
-    {file = "cci_tag_scanner-2.3.1-py3-none-any.whl", hash = "sha256:c3a6c0b3b286997b29250ff982f9957bd98326efe46984dccc25aa39933571d9"},
-    {file = "cci_tag_scanner-2.3.1.tar.gz", hash = "sha256:081b93959bc2641a47f5432ae37f5754b3d1bffffebe30902e228845fc061092"},
+    {file = "cci_tag_scanner-2.4.0-py3-none-any.whl", hash = "sha256:a18b169e363bf83c757f1ecb244b253ce0932d0cbf23b80b3083f7d7d197ae28"},
+    {file = "cci_tag_scanner-2.4.0.tar.gz", hash = "sha256:edc4a9e33b4f83a8fd24305c8b23720a979588135d19f365db64e7b0b95a5fce"},
 ]
 
 [package.dependencies]
 ceda-directory-tree = ">=1.2.0"
-elasticsearch = ">=7.6.0,<7.7"
+elasticsearch = ">=8,<9"
 jinja2 = ">=3,<4"
 netcdf4 = ">=1.7.2,<2.0.0"
 numpy = ">=1.25,<2.0"
@@ -309,24 +309,49 @@ files = [
 ]
 
 [[package]]
-name = "elasticsearch"
-version = "7.6.0"
-description = "Python client for Elasticsearch"
+name = "elastic-transport"
+version = "8.17.1"
+description = "Transport classes and utilities shared among Python Elastic client libraries"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
+python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "elasticsearch-7.6.0-py2.py3-none-any.whl", hash = "sha256:f4bb05cfe55cf369bdcb4d86d0129d39d66a91fd9517b13cd4e4231fbfcf5c81"},
-    {file = "elasticsearch-7.6.0.tar.gz", hash = "sha256:d228b2d37ac0865f7631335268172dbdaa426adec1da3ed006dddf05134f89c8"},
+    {file = "elastic_transport-8.17.1-py3-none-any.whl", hash = "sha256:192718f498f1d10c5e9aa8b9cf32aed405e469a7f0e9d6a8923431dbb2c59fb8"},
+    {file = "elastic_transport-8.17.1.tar.gz", hash = "sha256:5edef32ac864dca8e2f0a613ef63491ee8d6b8cfb52881fa7313ba9290cac6d2"},
 ]
 
 [package.dependencies]
-urllib3 = ">=1.21.1"
+certifi = "*"
+urllib3 = ">=1.26.2,<3"
 
 [package.extras]
-develop = ["black", "coverage", "jinja2", "mock", "nose", "nosexcover", "pyyaml", "requests (>=2.0.0,<3.0.0)", "sphinx (<1.7)", "sphinx-rtd-theme"]
-docs = ["sphinx (<1.7)", "sphinx-rtd-theme"]
-requests = ["requests (>=2.4.0,<3.0.0)"]
+develop = ["aiohttp", "furo", "httpx", "opentelemetry-api", "opentelemetry-sdk", "orjson", "pytest", "pytest-asyncio", "pytest-cov", "pytest-httpserver", "pytest-mock", "requests", "respx", "sphinx (>2)", "sphinx-autodoc-typehints", "trustme"]
+
+[[package]]
+name = "elasticsearch"
+version = "8.18.1"
+description = "Python client for Elasticsearch"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "elasticsearch-8.18.1-py3-none-any.whl", hash = "sha256:1a8c8b5ec3ce5be88f96d2f898375671648e96272978bce0dee3137d9326aabb"},
+    {file = "elasticsearch-8.18.1.tar.gz", hash = "sha256:998035f17a8c1fba7ae26b183dca797dcf95db86da6a7ecba56d31afc40f07c7"},
+]
+
+[package.dependencies]
+elastic-transport = ">=8.15.1,<9"
+python-dateutil = "*"
+typing-extensions = "*"
+
+[package.extras]
+async = ["aiohttp (>=3,<4)"]
+dev = ["aiohttp", "black", "build", "coverage", "isort", "jinja2", "mapbox-vector-tile", "mypy", "nltk", "nox", "numpy", "orjson", "pandas", "pyarrow", "pyright", "pytest", "pytest-asyncio", "pytest-cov", "pytest-mock", "python-dateutil", "pyyaml (>=5.4)", "requests (>=2,<3)", "sentence-transformers", "simsimd", "tqdm", "twine", "types-python-dateutil", "types-tqdm", "unasync"]
+docs = ["sphinx", "sphinx-autodoc-typehints", "sphinx-rtd-theme (>=2.0)"]
+orjson = ["orjson (>=3)"]
+pyarrow = ["pyarrow (>=1)"]
+requests = ["requests (>=2.4.0,!=2.32.2,<3.0.0)"]
+vectorstore-mmr = ["numpy (>=1)", "simsimd (>=3)"]
 
 [[package]]
 name = "exceptiongroup"
@@ -711,6 +736,21 @@ tomli = {version = ">=1", markers = "python_version < \"3.11\""}
 dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
+name = "python-dateutil"
+version = "2.9.0.post0"
+description = "Extensions to the standard Python datetime module"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+groups = ["main"]
+files = [
+    {file = "python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"},
+    {file = "python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"},
+]
+
+[package.dependencies]
+six = ">=1.5"
+
+[[package]]
 name = "requests"
 version = "2.32.3"
 description = "Python HTTP for Humans."
@@ -987,7 +1027,6 @@ description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version < \"3.11\""
 files = [
     {file = "typing_extensions-4.13.1-py3-none-any.whl", hash = "sha256:4b6cf02909eb5495cfbc3f6e8fd49217e6cc7944e145cdda8caa3734777f9e69"},
     {file = "typing_extensions-4.13.1.tar.gz", hash = "sha256:98795af00fb9640edec5b8e31fc647597b4691f099ad75f469a2616be1a76dff"},
@@ -1067,4 +1106,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4.0"
-content-hash = "e7815b36def2fee545028082737d9597a9d29aa5a4fbfc9fd3b05ccd009f27b0"
+content-hash = "b5cf22a0ef8109bd9fb4ea6ebc4a5ed19f12a6052eacda6dc14c6b3fdcfdffe1"
