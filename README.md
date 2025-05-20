@@ -4,6 +4,11 @@
 ![GitHub Release](https://img.shields.io/github/v/release/cedadev/facet-scanner)
 [![PyPI version](https://badge.fury.io/py/cci-facet-scanner.svg)](https://pypi.python.org/pypi/cci-facet-scanner/)
 
+## CEDA Dependencies
+
+![Static Badge](https://img.shields.io/badge/elasticsearch%20v8-3BBEB1)
+![Static Badge](https://img.shields.io/badge/MOLES%20API%20v2-00628D)
+
 
 Takes datasets and extracts the facets from the files/filepath.
 The scanner works to map a file path to the specific handler for that collection of files. For example, ESA CCI datasets are scanned by the cci handler. This is because each collection of datasets will have different characteristics and will need to be treated in a different way.
