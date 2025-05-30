@@ -14,6 +14,7 @@ from typing import Union
 
 import logging
 from cci_facet_scanner import logstream
+from cci_facet_scanner.utils import settings
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
@@ -22,7 +23,6 @@ logger.propagate = False
 class ElasticsearchConnection:
     """
     Wrapper class to handle the connection with Elasticsearch.
-    Uses the `CEDAElasticsearchClient <https://github.com/cedadev/ceda-elasticsearch-tools>`_
     """
 
     def __init__(self, api_key: Union[str,None] = None, **kwargs):
@@ -34,7 +34,7 @@ class ElasticsearchConnection:
         api_key = api_key or ''
 
         self.es = Elasticsearch(
-            hosts=["https://elasticsearch.ceda.ac.uk"],
+            hosts=settings.ES_HOSTS,
             headers={'x-api-key':api_key},
             **kwargs)
 

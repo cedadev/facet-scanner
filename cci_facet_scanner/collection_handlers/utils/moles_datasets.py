@@ -27,12 +27,12 @@ class CatalogueDatasets:
     """
     Class to map a filepath to the relate MOLES record
 
-    :param moles_base: Base URL to the MOLES api server (default: http://api.catalogue.ceda.ac.uk).
+    :param moles_base: Base URL to the MOLES api server (default: https://api.catalogue.ceda.ac.uk).
     :type moles_base: str
 
     """
     
-    def __init__(self, moles_base='http://api.catalogue.ceda.ac.uk'):
+    def __init__(self, moles_base='https://api.catalogue.ceda.ac.uk'):
         """
 
         :param moles_base: The base URL for the MOLES API server
@@ -62,7 +62,7 @@ class CatalogueDatasets:
 
             {
                 "title": "ESA Fire Climate Change Initiative Project  (Fire CCI)",
-                "url": "http://catalogue.ceda.ac.uk/uuid/6c3584d985bd484e8beb23ff0df91292",
+                "url": "https://catalogue.ceda.ac.uk/uuid/6c3584d985bd484e8beb23ff0df91292",
                 "record_type": "Project",
                 "record_path": "",
                 "publication_state": "published"
