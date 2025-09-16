@@ -15,6 +15,7 @@ from typing import Union
 import logging
 from cci_facet_scanner import logstream
 from cci_tag_scanner.utils.elasticsearch import es_connection_kwargs
+from cci_facet_scanner.utils import settings
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
