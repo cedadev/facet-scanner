@@ -35,12 +35,11 @@ class ElasticsearchConnection:
             logger.warning(
                 'No API key given, ES client will not have write permission.'
             )
-        api_key = api_key or ''
 
         self.es = Elasticsearch(
-            es_connection_kwargs(
+            **es_connection_kwargs(
                 hosts=hosts,
-                api_key=api_key
+                api_key=api_key,
                 **kwargs
             )
         )
