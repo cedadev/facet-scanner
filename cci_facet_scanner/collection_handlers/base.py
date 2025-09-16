@@ -66,7 +66,7 @@ class CollectionHandler(metaclass=Singleton):
     #   }
     filters = []
 
-    def __init__(self, api_key: Union[str,None] = None,**kwargs):
+    def __init__(self, hosts: list = None, api_key: Union[str,None] = None,**kwargs):
         """
         Create the elasticsearch connection
 
@@ -77,7 +77,7 @@ class CollectionHandler(metaclass=Singleton):
         kwargs.pop('facet_json', None)
         kwargs.pop('moles_mapping', None)
 
-        self.es = ElasticsearchConnection(api_key=api_key, **kwargs)
+        self.es = ElasticsearchConnection(hosts=hosts, api_key=api_key, **kwargs)
 
     def get_facets(self, path):
         """
