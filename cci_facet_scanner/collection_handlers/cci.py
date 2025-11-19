@@ -423,6 +423,13 @@ class CCI(CollectionHandler):
         if aggregations:
             metadata.update(self._get_dataset_aggregations(result))
 
+        # Internal version corrections
+        vn = metadata.get('productVersion',[None])[0]
+        if vn is not None:
+            if vn[0] == 'v':
+                vn = vn[1:]
+                metadata['fixed_productVersion'] = [vn]
+
         return metadata
 
     def _generate_collections(self, collection_index, file_index):
