@@ -183,7 +183,7 @@ class CCI(CollectionHandler):
                 'lte': end_date
             }
         else:
-            val = [x for x in dates if x == True]
+            val = [x for x in dates if x]
 
             temporal['time_frame'] = {
                 'gte': val,
@@ -368,14 +368,8 @@ class CCI(CollectionHandler):
 
         query = {
             'query': {
-                'bool': {
-                    'must': [
-                        {
-                            'match_phrase_prefix': {
-                                'info.directory.analyzed': path
-                            }
-                        }
-                    ]
+                'prefix': {
+                    'info.directory': path
                 }
             },
             'size': 0,
