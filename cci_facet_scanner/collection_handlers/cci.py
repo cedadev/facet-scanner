@@ -12,6 +12,7 @@ from tqdm import tqdm
 import hashlib
 import json
 import logging
+import re
 
 from cci_facet_scanner.collection_handlers.base import CollectionHandler
 from cci_facet_scanner.collection_handlers.utils import CatalogueDatasets
@@ -419,10 +420,8 @@ class CCI(CollectionHandler):
 
         # Internal version corrections
         vn = metadata.get('productVersion',[None])[0]
-        if vn is not None:
-            if vn[0] == 'v':
-                vn = vn[1:]
-                metadata['fixed_productVersion'] = [vn]
+        if vn is not None:                
+            metadata['numericVersionId'] = [re.sub(r"[A-Za-z]", "", vn)]
 
         return metadata
 
@@ -437,7 +436,18 @@ class CCI(CollectionHandler):
         """
 
         collections = []
-        url = 'https://catalogue.ceda.ac.uk/api/v2/observations.json?fields=uuid,title,result_field&page=1&per_page=100&discoveryKeywords__name=ESACCI&publicationState__in=citable,published'
+        fields             = ['uuid', 'title', 'result_field','status','dataPublishedTime']
+        page               = {'page': 1, 'per_page': 100}
+        discovery_keywords = {'discoveryKeywords__name': 'ESACCI'}
+        publication_filter = {'publicationState__in': 'citable,published'}
+
+        url = 'https://catalogue.ceda.ac.uk/api/v3/observations/?'
+        url += f'fields={",".join(fields)}&'
+        url += '&'.join(f'{k}={v}' for k,v in page.items())
+        url += '&'
+        url += '&'.join(f'{k}={v}' for k,v in discovery_keywords.items())
+        url += '&'
+        url += '&'.join(f'{k}={v}' for k,v in publication_filter.items())
 
         # Find all datasets across all pages
         moles_datasets = []
@@ -464,6 +474,8 @@ class CCI(CollectionHandler):
                 'parent_identifier': self.collection_id,
                 'title': dataset['title'],
                 'path': dataset['result_field']['dataPath'],
+                'versionStatus': dataset['status'],
+                'publicationDate': dataset['dataPublishedTime'],
                 'is_published': True,
                 '__id': dataset['uuid']
             }
