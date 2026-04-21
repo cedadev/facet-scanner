@@ -32,11 +32,17 @@ def get_version_status_for_uuid(uuid: str):
     if relations.status_code != 200:
         return 'current'
     
+    if relations.json()['count'] == 0:
+        return 'current'
+    
     next_uuid = relations.json()['results'][0]['subjectObservation']['uuid']
 
     next_data = requests.get(f'https://catalogue.ceda.ac.uk/api/v3/observations/?uuid={next_uuid}')
 
     if next_data.status_code != 200:
+        return 'current'
+    
+    if next_data.json()['count'] == 0:
         return 'current'
     
     if next_data.json()['results'][0]['publicationState'] != 'preview':
