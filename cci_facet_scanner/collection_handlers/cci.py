@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
 logger.propagate = False
 
-def get_version_status_for_uuid(uuid: str):
+def get_version_status_for_uuid(uuid: str, find_incorrect: bool = False):
     relations = requests.get(f'https://catalogue.ceda.ac.uk/api/v3/relatedobservationinfos/?relationType=IsNewVersionOf&objectObservation__uuid={uuid}')
 
     if relations.status_code != 200:
@@ -46,9 +46,14 @@ def get_version_status_for_uuid(uuid: str):
         return 'current'
     
     if next_data.json()['results'][0]['publicationState'] != 'preview':
+
+        if find_incorrect:
+            if not relations.json()['results'][0]['objectObservation'].get('superseded'):
+                return 'superseded', False
+            else:
+                return 'superseded', True
         return 'superseded'
     return 'current'
-
 
 def nested_get(key_list, input_dict, default=None):
     """
