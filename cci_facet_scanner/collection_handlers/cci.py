@@ -26,6 +26,30 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
 logger.propagate = False
 
+def get_version_status_for_uuid(uuid: str):
+    relations = requests.get(f'https://catalogue.ceda.ac.uk/api/v3/relatedobservationinfos/?relationType=IsNewVersionOf&objectObservation__uuid={uuid}')
+
+    if relations.status_code != 200:
+        return 'current'
+    
+    if relations.json()['count'] == 0:
+        return 'current'
+    
+    next_uuid = relations.json()['results'][0]['subjectObservation']['uuid']
+
+    next_data = requests.get(f'https://catalogue.ceda.ac.uk/api/v3/observations/?uuid={next_uuid}')
+
+    if next_data.status_code != 200:
+        return 'current'
+    
+    if next_data.json()['count'] == 0:
+        return 'current'
+    
+    if next_data.json()['results'][0]['publicationState'] != 'preview':
+        return 'superseded'
+    return 'current'
+
+
 def nested_get(key_list, input_dict, default=None):
     """
     Takes an iterable of keys and returns none if not found or the value
@@ -469,12 +493,14 @@ class CCI(CollectionHandler):
 
         for dataset in tqdm(moles_datasets, desc='Looping MOLES datasets'):
 
+            version_status = get_version_status_for_uuid(dataset['uuid'])
+
             metadata = {
                 'collection_id': dataset['uuid'],
                 'parent_identifier': self.collection_id,
                 'title': dataset['title'],
                 'path': dataset['result_field']['dataPath'],
-                'versionStatus': dataset['status'],
+                'versionStatus': version_status,
                 'publicationDate': dataset['dataPublishedTime'],
                 'is_published': True,
                 '__id': dataset['uuid']
