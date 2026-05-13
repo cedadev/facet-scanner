@@ -394,6 +394,10 @@ class CCI(CollectionHandler):
         }
         """
 
+        # Remove trailing slash in path
+        if path[-1] == '/':
+            path = path[:-1]
+
         metadata = {}
 
         query = {
