@@ -56,14 +56,14 @@ files = [
 
 [[package]]
 name = "cci-tag-scanner"
-version = "2.6.1"
+version = "2.6.2"
 description = "This package provides a command line tool moles_esgf_tag to generate dataset tags for both MOLES and ESGF."
 optional = false
 python-versions = "<4,>=3.9"
 groups = ["main"]
 files = [
-    {file = "cci_tag_scanner-2.6.1-py3-none-any.whl", hash = "sha256:f848f9df004a3b084eeb529dae9cfe6744b546d2abcdfda43212a3cca8530ae7"},
-    {file = "cci_tag_scanner-2.6.1.tar.gz", hash = "sha256:4634a94d7df1e18a63621b3ce92b8c02ddee821b7d2366ea7e526aaa34d9aa3c"},
+    {file = "cci_tag_scanner-2.6.2-py3-none-any.whl", hash = "sha256:59f7ae3c5da0d31a83d1831248fae5d70d01f0342f37de5dd3bebbfc2588a396"},
+    {file = "cci_tag_scanner-2.6.2.tar.gz", hash = "sha256:b4424914ca03d79edb547cfe5d269518f26ed53dc7f9aca24100b510306fedbb"},
 ]
 
 [package.dependencies]
@@ -1105,4 +1105,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4.0"
-content-hash = "1f14115bd2eccc46555510fea61ba2209b5beeefdc662eea50381f9ac4653435"
+content-hash = "a55d5894bd27d86300a5a6c81c71a34d05ddabc32e7c2a0127a6b4b02a44a0f8"
