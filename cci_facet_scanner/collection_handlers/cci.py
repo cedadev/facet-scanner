@@ -397,13 +397,29 @@ class CCI(CollectionHandler):
         # Remove trailing slash in path
         if path[-1] == '/':
             path = path[:-1]
+        slash_path = path + '/'
 
         metadata = {}
 
         query = {
             'query': {
-                'prefix': {
-                    'info.directory': path
+                "bool": {
+                    "should": [
+                    {
+                        "term": {
+                            "info.directory": {
+                                "value": path # Matches exactly the unslashed path - will avoid i.e v2.2 matching v2.22
+                            }
+                        }
+                    },
+                    {
+                        "prefix": {
+                            "info.directory": {
+                                "value": slash_path # Matches any file under the directory.
+                            }
+                        }
+                    }
+                    ]
                 }
             },
             'size': 0,
