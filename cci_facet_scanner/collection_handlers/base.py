@@ -19,8 +19,8 @@ from typing import Union
 from tqdm import tqdm
 
 from cci_facet_scanner import logstream
-from cci_facet_scanner.core.elasticsearch_connection import \
-    ElasticsearchConnection
+from cci_facet_scanner.utils.elasticsearch import \
+    ElasticsearchBulkConnection
 from cci_facet_scanner.utils import Singleton, generator_grouper
 
 logger = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ class CollectionHandler(metaclass=Singleton):
         kwargs.pop('facet_json', None)
         kwargs.pop('moles_mapping', None)
 
-        self.es = ElasticsearchConnection(hosts=hosts, api_key=api_key, **kwargs)
+        self.es = ElasticsearchBulkConnection(hosts=hosts, api_key=api_key, **kwargs)
 
     def get_facets(self, path):
         """

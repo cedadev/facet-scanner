@@ -7,7 +7,7 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'daniel.westwood@stfc.ac.uk'
 
 from elasticsearch import Elasticsearch
-
+from elasticsearch.helpers import bulk, scan
 
 def es_connection_kwargs(hosts, api_key, **kwargs):
     """
@@ -104,3 +104,78 @@ class ElasticsearchConnection:
         :rtype: dict
         """
         return self.es.count(index=self.collection_index, body=query)
+    
+class ElasticsearchBulkConnection(ElasticsearchConnection):
+    """
+    Wrapper class to handle the connection with Elasticsearch.
+
+    Specifically replicated to handle bulk queries etc.
+    """
+
+    def get_hits(self, index, query=None):
+        return scan(self.es, query=query, index=index)
+
+    def get_query(self, extensions, path, excludes=[]):
+        query_base = {
+            "_source": {
+                "exclude": ["info.phenomena"]
+            },
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match_phrase_prefix": {
+                                "info.directory.analyzed": path
+                            }
+                        }
+                    ],
+                    "must_not": [],
+                    "filter": []
+                }
+            }
+        }
+
+        for ext in extensions:
+            filter = {
+                "term": {
+                    "info.type.keyword": ext
+                }
+            }
+
+            query_base["query"]["bool"]["filter"].append(filter)
+
+        for exclusion in excludes:
+            query_base["query"]["bool"]["must_not"].append(exclusion)
+
+        return query_base
+
+    def bulk(self, iterator, *args, generator=False):
+        if generator:
+                bulk(self.es, iterator(*args), refresh=True)
+        else:
+            bulk(self.es, iterator, refresh=True)
+
+    def mget(self, *args, **kwargs):
+        return self.es.mget(*args, **kwargs)
+
+    def search(self, *args, **kwargs):
+        return self.es.search(*args, **kwargs)
+
+    def create_collections_index(self, index):
+        
+        return self.es.indices.create(index=index, ignore=400, body={
+            "mappings": {
+                "properties": {
+                    "time_frame": {
+                        "type": "date_range"
+                    },
+                    "bbox": {
+                        "properties": {
+                            "coordinates": {
+                                "type": "geo_point"
+                            }
+                        }
+                    }
+                }
+            }
+        })

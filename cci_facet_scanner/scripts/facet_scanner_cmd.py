@@ -1,17 +1,5 @@
 # encoding: utf-8
 """
-
-Facet Scanner CMD MRO
----------------------
-
-1. cci_facet_scanner.scripts.cci_facet_scanner_cmd.FacetExtractor.process_path
-2. cci_facet_scanner.core.cci_facet_scanner.FacetScanner.get_handler
-3. cci_facet_scanner.collection_handlers.utils.facet_factory.FacetFactory.get_handler
-4. cci_facet_scanner.collection_handlers.base.CollectionHandler.export_facets
-5. facets_scanner.core.elasticsearch_connection.ElasticsearchConnection.get_query
-6. facets_scanner.core.elasticsearch_connection.ElasticsearchConnection.get_hits
-7. cci_facet_scanner.collection_handlers.base.CollectionHandler.lotus_submit
-
 """
 __author__ = 'Richard Smith'
 __date__ = '26 Mar 2019'

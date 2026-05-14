@@ -25,8 +25,6 @@ class TestConsistency:
         assert 1==1,"Import file handlers successful"
 
     def test_core(self):
-        from cci_facet_scanner.core.elasticsearch_connection import \
-            ElasticsearchConnection
         from cci_facet_scanner.core.facet_scanner import FacetScanner
 
         assert 1==1, "Import core successful"
