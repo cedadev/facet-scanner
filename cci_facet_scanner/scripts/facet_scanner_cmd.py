@@ -20,13 +20,13 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import argparse
+import logging
 import os
 from configparser import RawConfigParser
-from cci_facet_scanner.utils import query_yes_no
-from cci_facet_scanner.core.facet_scanner import FacetScanner
-import logging
 
 from cci_facet_scanner import logstream
+from cci_facet_scanner.core.facet_scanner import FacetScanner
+from cci_facet_scanner.utils import query_yes_no
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)

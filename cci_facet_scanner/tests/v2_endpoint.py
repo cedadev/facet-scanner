@@ -1,6 +1,7 @@
 import requests
 from tqdm import tqdm
 
+
 def request():
     url = 'https://catalogue.ceda.ac.uk/api/v2/observations.json?fields=uuid,title,result_field&page=1&per_page=100&discoveryKeywords__name=ESACCI&publicationState__in=citable,published'
     collections = []

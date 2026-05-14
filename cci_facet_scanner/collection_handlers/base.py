@@ -8,19 +8,20 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from cci_facet_scanner.core.elasticsearch_connection import ElasticsearchConnection
+import importlib.util
+import json
+import logging
 import os
 import subprocess
-import json
-import importlib.util
-from tqdm import tqdm
-from cci_facet_scanner.utils import generator_grouper, Singleton
 import time
-
 from typing import Union
 
+from tqdm import tqdm
+
 from cci_facet_scanner import logstream
-import logging
+from cci_facet_scanner.core.elasticsearch_connection import \
+    ElasticsearchConnection
+from cci_facet_scanner.utils import Singleton, generator_grouper
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)

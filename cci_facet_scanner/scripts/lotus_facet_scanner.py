@@ -18,13 +18,13 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from cci_facet_scanner.scripts.facet_scanner_cmd import FacetExtractor
 import argparse
-import os
 import json
-
 import logging
+import os
+
 from cci_facet_scanner import logstream
+from cci_facet_scanner.scripts.facet_scanner_cmd import FacetExtractor
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)

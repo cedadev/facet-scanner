@@ -7,20 +7,20 @@ __date__ = '29 October 2024'
 __copyright__ = 'Copyright 2024 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 
-import requests
-from tqdm import tqdm
 import hashlib
 import json
 import logging
 import re
+from typing import Union
 
+import requests
+from tqdm import tqdm
+
+from cci_facet_scanner import logstream
 from cci_facet_scanner.collection_handlers.base import CollectionHandler
 from cci_facet_scanner.collection_handlers.utils import CatalogueDatasets
+from cci_facet_scanner.tagging.tagger import ProcessDatasets
 from cci_facet_scanner.utils import parse_key
-from cci_tag_scanner.tagger import ProcessDatasets
-
-from typing import Union
-from cci_facet_scanner import logstream
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)

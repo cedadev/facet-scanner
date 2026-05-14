@@ -7,14 +7,15 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from pydoc import locate
-from .collection_map import COLLECTION_MAP
-import os
-from typing import Optional, Tuple
-from cci_facet_scanner.collection_handlers.base import CollectionHandler
 import logging
+import os
+from pydoc import locate
+from typing import Optional, Tuple
 
 from cci_facet_scanner import logstream
+from cci_facet_scanner.collection_handlers.base import CollectionHandler
+
+from .collection_map import COLLECTION_MAP
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
