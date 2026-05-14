@@ -29,7 +29,8 @@ dependencies = [
     "numpy (>=2,<3)",
     "netcdf4 (>=1.7.2,<2.0.0)",
     "six (>=1.16.0,<2.0.0)",
-    "ceda-directory-tree (>=1.2.0)"
+    "ceda-directory-tree (>=1.2.0)",
+    "urllib3 (>=2.7.0,<3.0.0)"
 ]
 
 [tool.poetry.group.dev.dependencies]
