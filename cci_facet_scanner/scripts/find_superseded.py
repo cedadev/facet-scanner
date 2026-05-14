@@ -1,6 +1,9 @@
 import requests
 from tqdm import tqdm
-from cci_facet_scanner.collection_handlers.cci import get_version_status_for_uuid
+
+from cci_facet_scanner.collection_handlers.cci import \
+    get_version_status_for_uuid
+
 
 def main():
 

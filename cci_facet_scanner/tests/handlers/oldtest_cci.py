@@ -9,6 +9,7 @@ __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
 import unittest
+
 from cci_facet_scanner.collection_handlers.cci import CCI
 
 

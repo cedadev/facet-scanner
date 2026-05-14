@@ -4,6 +4,12 @@
 ![GitHub Release](https://img.shields.io/github/v/release/cedadev/facet-scanner)
 [![PyPI version](https://badge.fury.io/py/cci-facet-scanner.svg)](https://pypi.python.org/pypi/cci-facet-scanner/)
 
+## May 2026 - Merge with Tag Scanner
+
+The dependency package `cci-tag-scanner` has been merged into this repository, as it no longer serves a useful purpose to keep the two packages separated. All required content will be migrated from the tag scanner into this package.
+- tagger.processDatasets
+- es_connection_kwargs/ElasticsearchConnection
+
 ## CEDA Dependencies
 
 ![Static Badge](https://img.shields.io/badge/elasticsearch%20v8-3BBEB1)

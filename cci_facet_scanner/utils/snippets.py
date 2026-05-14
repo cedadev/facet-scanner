@@ -8,10 +8,10 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-import sys
 import itertools
-from collections import OrderedDict
 import logging
+import sys
+from collections import OrderedDict, namedtuple
 
 from cci_facet_scanner import logstream
 
@@ -169,3 +169,26 @@ class Singleton(type):
             self._instance = super().__call__(*args, **kwargs)
 
         return self._instance
+
+def get_file_subset(path_gen, max_number):
+    """
+    Get a subset of file from a generator
+    :param path_gen: pathlib.Path.glob
+    :param max_number: int
+    :return: list of pathlib.Path objects
+    """
+
+    filelist = []
+    while len(filelist) < max_number:
+
+        try:
+            next_path = next(path_gen)
+            if next_path.is_file():
+                filelist.append(next_path)
+
+        except StopIteration:
+            break
+
+    return filelist
+
+TaggedDataset = namedtuple('TaggedDataset', ['drs','labels','uris'])

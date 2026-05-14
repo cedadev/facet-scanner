@@ -7,12 +7,13 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-import os
-import requests
-from json.decoder import JSONDecodeError
-from requests.exceptions import Timeout
 import json
 import logging
+import os
+from json.decoder import JSONDecodeError
+
+import requests
+from requests.exceptions import Timeout
 
 from cci_facet_scanner import logstream
 

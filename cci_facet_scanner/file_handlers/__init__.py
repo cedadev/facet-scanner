@@ -5,6 +5,3 @@ __date__ = '29 Oct 2024'
 __copyright__ = 'Copyright 2024 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'daniel.westwood@stfc.ac.uk'
-
-from .check_json import TestJSONFile
-from .command_line_client import CCITaggerCommandLineClient

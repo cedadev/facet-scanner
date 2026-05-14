@@ -8,14 +8,15 @@ __copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
 __license__ = 'BSD - see LICENSE file in top-level package directory'
 __contact__ = 'richard.d.smith@stfc.ac.uk'
 
-from elasticsearch.helpers import scan, bulk
-from elasticsearch import Elasticsearch
+import logging
 from typing import Union
 
-import logging
+from elasticsearch import Elasticsearch
+from elasticsearch.helpers import bulk, scan
+
 from cci_facet_scanner import logstream
-from cci_tag_scanner.utils.elasticsearch import es_connection_kwargs
 from cci_facet_scanner.utils import settings
+from cci_facet_scanner.utils.elasticsearch import es_connection_kwargs
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logstream)
