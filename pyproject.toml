@@ -1,6 +1,6 @@
 [project]
 name = "cci-facet-scanner"
-version = "0.8.3"
+version = "0.8.4"
 description = "Extracts facets from datasets to add to elasticsearch."
 authors = [
     { name = "Daniel Westwood", email = "daniel.westwood@stfc.ac.uk"}
@@ -41,11 +41,11 @@ sphinx-rtd-theme = "^3.0.2"
 isort = "^8.0.1"
 
 [project.scripts]
-facet_scanner = "facet_scanner.scripts.facet_scanner_cmd:FacetExtractor.main"
-moles_esgf_tag = "facet_scanner.scripts:CCITaggerCommandLineClient.main"
-cci_json_check = "facet_scanner.scripts:TestJSONFile.cmd"
-cci_check_tags = "facet_scanner.scripts.check_tags:main"
-export_facet_json = "facet_scanner.scripts.dump_facet_object:main"
+facet_scanner = "cci_facet_scanner.scripts.facet_scanner_cmd:FacetExtractor.main"
+moles_esgf_tag = "cci_facet_scanner.scripts:CCITaggerCommandLineClient.main"
+cci_json_check = "cci_facet_scanner.scripts:TestJSONFile.cmd"
+cci_check_tags = "cci_facet_scanner.scripts.check_tags:main"
+export_facet_json = "cci_facet_scanner.scripts.dump_facet_object:main"
 
 [build-system]
 requires = ["poetry-core"]
