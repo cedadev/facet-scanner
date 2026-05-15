@@ -78,7 +78,7 @@ class CollectionHandler(metaclass=Singleton):
         kwargs.pop('facet_json', None)
         kwargs.pop('moles_mapping', None)
 
-        self.es = ElasticsearchBulkConnection(hosts=hosts, api_key=api_key, **kwargs)
+        self.es = ElasticsearchBulkConnection(host=hosts, api_key=api_key, **kwargs)
 
     def get_facets(self, path):
         """

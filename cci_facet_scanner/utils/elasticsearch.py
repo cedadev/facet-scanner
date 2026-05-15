@@ -32,18 +32,21 @@ class ElasticsearchConnection:
 
     """
 
-    def __init__(self, host, api_key, index=None, collection_index=None, connection_params=None):
+    def __init__(self, host: str | list, api_key, index=None, collection_index=None, connection_params=None):
         self.index = index
         self.collection_index = collection_index
 
         connection_params = connection_params or {}
+
+        if isinstance(host, str):
+            host = [host]
 
         if isinstance(api_key,str):
             api_key = api_key.rstrip()
 
         self.es = Elasticsearch(
             **es_connection_kwargs(
-                hosts=[host],
+                hosts=host,
                 api_key=api_key,
                 **connection_params
             )
